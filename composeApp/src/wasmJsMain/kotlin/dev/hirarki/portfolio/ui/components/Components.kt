@@ -1,10 +1,14 @@
 package dev.hirarki.portfolio.ui.components
 
+import androidx.compose.animation.core.EaseOutCubic
+import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.hoverable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.interaction.collectIsPressedAsState
@@ -54,8 +58,27 @@ fun GlowCard(
     cornerRadius: Dp = 16.dp,
     content: @Composable BoxScope.() -> Unit
 ) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val isHovered by interactionSource.collectIsHoveredAsState()
+
+    // Enhanced hover animation for desktop
+    val glowAlphaMultiplier by animateFloatAsState(
+        targetValue = if (isHovered) 2.0f else 1.0f,
+        animationSpec = tween(durationMillis = 200)
+    )
+
+    val scale by animateFloatAsState(
+        targetValue = if (isHovered) 1.015f else 1.0f,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessLow
+        )
+    )
+
     Surface(
         modifier = modifier
+            .hoverable(interactionSource)
+            .scale(scale)
             .drawBehind {
                 drawIntoCanvas { canvas ->
                     val paint = Paint()
@@ -67,16 +90,18 @@ fun GlowCard(
                         radiusX = cornerRadius.toPx(),
                         radiusY = cornerRadius.toPx(),
                         paint = paint.apply {
-                            color = glowColor
+                            color = glowColor.copy(alpha = (glowColor.alpha * glowAlphaMultiplier).coerceAtMost(1f))
                         }
                     )
                 }
             },
         shape = RoundedCornerShape(cornerRadius),
         color = ObsidianColors.Container,
-        border = BorderStroke(1.dp, borderColor)
+        border = BorderStroke(1.dp, if (isHovered) glowColor.copy(alpha = 0.6f) else borderColor)
     ) {
-        Box(content = content)
+        Box {
+            content()
+        }
     }
 }
 
@@ -102,22 +127,33 @@ fun NeonButton(
 
     val scale by animateFloatAsState(
         targetValue = when {
-            isPressed -> 0.97f
+            isPressed -> 0.96f
             isHovered -> 1.03f
             else -> 1.0f
         },
-        animationSpec = tween(durationMillis = 150)
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessMedium
+        )
     )
 
     val shape = RoundedCornerShape(percent = 50)
 
     val (bgColor, textColor, borderStroke) = when (variant) {
         NeonButtonVariant.PRIMARY -> {
-            val bg = if (isHovered) ObsidianColors.PrimaryDim else ObsidianColors.Primary
+            val bg = when {
+                isPressed -> ObsidianColors.Primary
+                isHovered -> ObsidianColors.PrimaryDim
+                else -> ObsidianColors.Primary
+            }
             Triple(bg, Color.Black, null)
         }
         NeonButtonVariant.SECONDARY -> {
-            val bg = if (isHovered) ObsidianColors.GlowCyan else Color.Transparent
+            val bg = when {
+                isPressed -> ObsidianColors.Primary.copy(alpha = 0.25f)
+                isHovered -> ObsidianColors.GlowCyan
+                else -> Color.Transparent
+            }
             Triple(bg, ObsidianColors.Primary, BorderStroke(1.dp, ObsidianColors.Primary))
         }
     }
@@ -226,7 +262,10 @@ fun AnimatedCounter(
 
     val animatedValue by animateFloatAsState(
         targetValue = if (started) targetValue.toFloat() else 0f,
-        animationSpec = tween(durationMillis = durationMs)
+        animationSpec = tween(
+            durationMillis = durationMs,
+            easing = EaseOutCubic
+        )
     )
 
     val formattedNumber = if (targetValue % 1.0 == 0.0) {

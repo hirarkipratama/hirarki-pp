@@ -207,238 +207,245 @@ fun ProjectModal(
             },
         contentAlignment = Alignment.Center
     ) {
-        // Modal Card Container
-        GlowCard(
-            modifier = Modifier
-                .padding(20.dp)
-                .fillMaxWidth(0.92f)
-                .fillMaxHeight(0.90f)
-                .clickable(
-                    interactionSource = remember { MutableInteractionSource() },
-                    indication = null,
-                    onClick = { /* prevent click-through */ }
-                ),
-            glowColor = accentColor.copy(alpha = 0.25f),
-            borderColor = accentColor.copy(alpha = 0.5f),
-            cornerRadius = 20.dp
-        ) {
-            Column(
+        AnimatedContent(
+            targetState = project,
+            contentAlignment = Alignment.Center
+        ) { currentProject ->
+            val currentAccentColor = parseHexColor(currentProject.accentColor)
+
+            // Modal Card Container
+            GlowCard(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .verticalScroll(rememberScrollState())
-                    .padding(28.dp),
-                verticalArrangement = Arrangement.spacedBy(24.dp)
+                    .padding(20.dp)
+                    .fillMaxWidth(0.92f)
+                    .fillMaxHeight(0.90f)
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null,
+                        onClick = { /* prevent click-through */ }
+                    ),
+                glowColor = currentAccentColor.copy(alpha = 0.25f),
+                borderColor = currentAccentColor.copy(alpha = 0.5f),
+                cornerRadius = 20.dp
             ) {
-                // Header row: Title + Close Button
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .verticalScroll(rememberScrollState())
+                        .padding(28.dp),
+                    verticalArrangement = Arrangement.spacedBy(24.dp)
                 ) {
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            text = project.category.uppercase(),
-                            style = PortfolioTypography.labelLarge.copy(
-                                color = accentColor,
-                                fontWeight = FontWeight.Bold,
-                                letterSpacing = 1.2.sp
-                            )
-                        )
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Text(
-                            text = project.title,
-                            style = PortfolioTypography.headlineLarge.copy(
-                                color = ObsidianColors.OnSurface,
-                                fontWeight = FontWeight.Bold
-                            )
-                        )
-                    }
-
-                    IconButton(
-                        onClick = onDismiss,
-                        modifier = Modifier
-                            .size(44.dp)
-                            .clip(CircleShape)
-                            .background(ObsidianColors.ContainerMid)
+                    // Header row: Title + Close Button
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Icon(
-                            imageVector = Icons.Default.Close,
-                            contentDescription = "Close modal",
-                            tint = ObsidianColors.OnSurface
-                        )
-                    }
-                }
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = currentProject.category.uppercase(),
+                                style = PortfolioTypography.labelLarge.copy(
+                                    color = currentAccentColor,
+                                    fontWeight = FontWeight.Bold,
+                                    letterSpacing = 1.2.sp
+                                )
+                            )
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(
+                                text = currentProject.title,
+                                style = PortfolioTypography.headlineLarge.copy(
+                                    color = ObsidianColors.OnSurface,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            )
+                        }
 
-                // Platform tags
-                if (project.platform.isNotEmpty()) {
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        project.platform.forEach { plat ->
-                            TechPill(label = plat, color = accentColor)
+                        IconButton(
+                            onClick = onDismiss,
+                            modifier = Modifier
+                                .size(44.dp)
+                                .clip(CircleShape)
+                                .background(ObsidianColors.ContainerMid)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Close,
+                                contentDescription = "Close modal",
+                                tint = ObsidianColors.OnSurface
+                            )
                         }
                     }
-                }
 
-                // Screenshots Gallery inside modal
-                if (project.screenshots.isNotEmpty()) {
-                    ScreenshotGallery(
-                        screenshots = project.screenshots,
-                        screenshotHeight = 360,
-                        maxScreenshotsDesktop = 3
+                    // Platform tags
+                    if (currentProject.platform.isNotEmpty()) {
+                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            currentProject.platform.forEach { plat ->
+                                TechPill(label = plat, color = currentAccentColor)
+                            }
+                        }
+                    }
+
+                    // Screenshots Gallery inside modal
+                    if (currentProject.screenshots.isNotEmpty()) {
+                        ScreenshotGallery(
+                            screenshots = currentProject.screenshots,
+                            screenshotHeight = 360,
+                            maxScreenshotsDesktop = 3
+                        )
+                    }
+
+                    // Summary
+                    Text(
+                        text = currentProject.summary,
+                        style = PortfolioTypography.bodyLarge.copy(
+                            color = ObsidianColors.OnSurface,
+                            lineHeight = 26.sp
+                        )
                     )
-                }
 
-                // Summary
-                Text(
-                    text = project.summary,
-                    style = PortfolioTypography.bodyLarge.copy(
-                        color = ObsidianColors.OnSurface,
-                        lineHeight = 26.sp
-                    )
-                )
-
-                // The Problem
-                if (!project.problem.isNullOrBlank()) {
-                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Text(
-                            text = "THE PROBLEM",
-                            style = PortfolioTypography.labelLarge.copy(
-                                color = accentColor,
-                                fontWeight = FontWeight.Bold
+                    // The Problem
+                    if (!currentProject.problem.isNullOrBlank()) {
+                        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                            Text(
+                                text = "THE PROBLEM",
+                                style = PortfolioTypography.labelLarge.copy(
+                                    color = currentAccentColor,
+                                    fontWeight = FontWeight.Bold
+                                )
                             )
-                        )
-                        Text(
-                            text = project.problem,
-                            style = PortfolioTypography.bodyMedium.copy(
-                                color = ObsidianColors.OnSurfaceDim,
-                                lineHeight = 22.sp
+                            Text(
+                                text = currentProject.problem,
+                                style = PortfolioTypography.bodyMedium.copy(
+                                    color = ObsidianColors.OnSurfaceDim,
+                                    lineHeight = 22.sp
+                                )
                             )
-                        )
+                        }
                     }
-                }
 
-                // The Approach / Solution
-                if (!project.solution.isNullOrBlank()) {
-                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Text(
-                            text = "THE APPROACH & ARCHITECTURE",
-                            style = PortfolioTypography.labelLarge.copy(
-                                color = accentColor,
-                                fontWeight = FontWeight.Bold
+                    // The Approach / Solution
+                    if (!currentProject.solution.isNullOrBlank()) {
+                        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                            Text(
+                                text = "THE APPROACH & ARCHITECTURE",
+                                style = PortfolioTypography.labelLarge.copy(
+                                    color = currentAccentColor,
+                                    fontWeight = FontWeight.Bold
+                                )
                             )
-                        )
-                        Text(
-                            text = project.solution,
-                            style = PortfolioTypography.bodyMedium.copy(
-                                color = ObsidianColors.OnSurface,
-                                lineHeight = 22.sp
+                            Text(
+                                text = currentProject.solution,
+                                style = PortfolioTypography.bodyMedium.copy(
+                                    color = ObsidianColors.OnSurface,
+                                    lineHeight = 22.sp
+                                )
                             )
-                        )
+                        }
                     }
-                }
 
-                // Impact
-                if (!project.impact.isNullOrBlank()) {
-                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Text(
-                            text = "IMPACT & RESULTS",
-                            style = PortfolioTypography.labelLarge.copy(
-                                color = ObsidianColors.Secondary,
-                                fontWeight = FontWeight.Bold
+                    // Impact
+                    if (!currentProject.impact.isNullOrBlank()) {
+                        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                            Text(
+                                text = "IMPACT & RESULTS",
+                                style = PortfolioTypography.labelLarge.copy(
+                                    color = ObsidianColors.Secondary,
+                                    fontWeight = FontWeight.Bold
+                                )
                             )
-                        )
-                        Text(
-                            text = project.impact,
-                            style = PortfolioTypography.bodyMedium.copy(
-                                color = ObsidianColors.OnSurface,
-                                lineHeight = 22.sp
+                            Text(
+                                text = currentProject.impact,
+                                style = PortfolioTypography.bodyMedium.copy(
+                                    color = ObsidianColors.OnSurface,
+                                    lineHeight = 22.sp
+                                )
                             )
-                        )
+                        }
                     }
-                }
 
-                // Metrics Chips
-                if (project.metrics.isNotEmpty()) {
-                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Text(
-                            text = "KEY METRICS",
-                            style = PortfolioTypography.labelLarge.copy(
-                                color = accentColor,
-                                fontWeight = FontWeight.Bold
+                    // Metrics Chips
+                    if (currentProject.metrics.isNotEmpty()) {
+                        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                            Text(
+                                text = "KEY METRICS",
+                                style = PortfolioTypography.labelLarge.copy(
+                                    color = currentAccentColor,
+                                    fontWeight = FontWeight.Bold
+                                )
                             )
-                        )
-                        FlowRow(
-                            horizontalArrangement = Arrangement.spacedBy(12.dp),
-                            verticalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            project.metrics.forEach { metric ->
-                                GlowCard(
-                                    glowColor = accentColor.copy(alpha = 0.15f),
-                                    cornerRadius = 8.dp
-                                ) {
-                                    Row(
-                                        modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp),
-                                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                                        verticalAlignment = Alignment.CenterVertically
+                            FlowRow(
+                                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                                verticalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                currentProject.metrics.forEach { metric ->
+                                    GlowCard(
+                                        glowColor = currentAccentColor.copy(alpha = 0.15f),
+                                        cornerRadius = 8.dp
                                     ) {
-                                        Text(
-                                            text = metric.label,
-                                            style = PortfolioTypography.labelSmall.copy(color = ObsidianColors.OnSurfaceDim)
-                                        )
-                                        Text(
-                                            text = metric.value,
-                                            style = PortfolioTypography.labelLarge.copy(
-                                                color = accentColor,
-                                                fontWeight = FontWeight.Bold
+                                        Row(
+                                            modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp),
+                                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            Text(
+                                                text = metric.label,
+                                                style = PortfolioTypography.labelSmall.copy(color = ObsidianColors.OnSurfaceDim)
                                             )
-                                        )
+                                            Text(
+                                                text = metric.value,
+                                                style = PortfolioTypography.labelLarge.copy(
+                                                    color = currentAccentColor,
+                                                    fontWeight = FontWeight.Bold
+                                                )
+                                            )
+                                        }
                                     }
                                 }
                             }
                         }
                     }
-                }
 
-                // Technologies
-                if (project.technologies.isNotEmpty()) {
-                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Text(
-                            text = "TECHNOLOGIES",
-                            style = PortfolioTypography.labelLarge.copy(
-                                color = ObsidianColors.Primary,
-                                fontWeight = FontWeight.Bold
+                    // Technologies
+                    if (currentProject.technologies.isNotEmpty()) {
+                        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                            Text(
+                                text = "TECHNOLOGIES",
+                                style = PortfolioTypography.labelLarge.copy(
+                                    color = ObsidianColors.Primary,
+                                    fontWeight = FontWeight.Bold
+                                )
                             )
-                        )
-                        FlowRow(
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
-                            verticalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            project.technologies.forEach { tech ->
-                                TechPill(label = tech, color = ObsidianColors.Primary)
+                            FlowRow(
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                verticalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                currentProject.technologies.forEach { tech ->
+                                    TechPill(label = tech, color = ObsidianColors.Primary)
+                                }
                             }
                         }
                     }
-                }
 
-                // CTAs Row
-                if (project.caseStudyUrl != null || project.githubUrl != null) {
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(16.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.padding(top = 8.dp)
-                    ) {
-                        if (project.caseStudyUrl != null) {
-                            NeonButton(
-                                text = "View Case Study",
-                                onClick = { window.open(project.caseStudyUrl, "_blank") },
-                                variant = NeonButtonVariant.PRIMARY
-                            )
-                        }
-                        if (project.githubUrl != null) {
-                            NeonButton(
-                                text = "GitHub",
-                                onClick = { window.open(project.githubUrl, "_blank") },
-                                variant = NeonButtonVariant.SECONDARY
-                            )
+                    // CTAs Row
+                    if (currentProject.caseStudyUrl != null || currentProject.githubUrl != null) {
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(16.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.padding(top = 8.dp)
+                        ) {
+                            if (currentProject.caseStudyUrl != null) {
+                                NeonButton(
+                                    text = "View Case Study",
+                                    onClick = { window.open(currentProject.caseStudyUrl, "_blank") },
+                                    variant = NeonButtonVariant.PRIMARY
+                                )
+                            }
+                            if (currentProject.githubUrl != null) {
+                                NeonButton(
+                                    text = "GitHub",
+                                    onClick = { window.open(currentProject.githubUrl, "_blank") },
+                                    variant = NeonButtonVariant.SECONDARY
+                                )
+                            }
                         }
                     }
                 }

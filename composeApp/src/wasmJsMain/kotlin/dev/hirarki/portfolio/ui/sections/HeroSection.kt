@@ -77,7 +77,7 @@ fun HeroSection(
     ) {
         val containerWidth = maxWidth
         val isDesktop = containerWidth >= 1024.dp
-        val horizontalPadding = if (containerWidth > 1200.dp) 80.dp else if (containerWidth > 768.dp) 40.dp else 24.dp
+        val horizontalPadding = if (containerWidth > 1200.dp) 120.dp else if (containerWidth > 600.dp) 48.dp else 20.dp
         val verticalPadding = if (isDesktop) 120.dp else 60.dp
 
         Box(

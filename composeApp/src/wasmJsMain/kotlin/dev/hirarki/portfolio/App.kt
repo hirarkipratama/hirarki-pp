@@ -3,6 +3,10 @@ package dev.hirarki.portfolio
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -17,16 +21,21 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import dev.hirarki.portfolio.di.AppModule
 import dev.hirarki.portfolio.presentation.state.PortfolioUiState
 import dev.hirarki.portfolio.presentation.viewmodel.PortfolioViewModel
+import dev.hirarki.portfolio.ui.components.FullscreenMobileMenu
 import dev.hirarki.portfolio.ui.components.NavBar
 import dev.hirarki.portfolio.ui.components.NeonButton
 import dev.hirarki.portfolio.ui.components.NeonButtonVariant
@@ -42,7 +51,9 @@ import dev.hirarki.portfolio.ui.sections.downloadCV
 import dev.hirarki.portfolio.ui.theme.ObsidianColors
 import dev.hirarki.portfolio.ui.theme.PortfolioTheme
 import dev.hirarki.portfolio.ui.theme.PortfolioTypography
+import dev.hirarki.portfolio.ui.theme.rememberWindowDimensions
 import kotlinx.browser.document
+import kotlinx.browser.window
 import org.w3c.dom.HTMLMetaElement
 
 private fun jsScrollToSection(sectionId: String): Unit =
@@ -51,6 +62,19 @@ private fun jsScrollToSection(sectionId: String): Unit =
 fun scrollToSection(sectionId: String) {
     jsScrollToSection(sectionId)
 }
+
+private fun addJsKeydownListener(onEscape: () -> Unit): () -> Unit =
+    js("""
+        {
+            var handler = function(e) {
+                if (e.key === 'Escape' || e.keyCode === 27) {
+                    onEscape();
+                }
+            };
+            window.addEventListener('keydown', handler);
+            return function() { window.removeEventListener('keydown', handler); };
+        }
+    """)
 
 @Composable
 fun App() {
@@ -66,6 +90,19 @@ fun App() {
 
     val uiState by viewModel.uiState.collectAsState()
     val selectedProject by viewModel.selectedProject.collectAsState()
+    var isMobileMenuOpen by remember { mutableStateOf(false) }
+
+    // Keyboard listener: Escape closes modal or mobile menu
+    DisposableEffect(selectedProject, isMobileMenuOpen) {
+        val cleanup = addJsKeydownListener {
+            if (selectedProject != null) {
+                viewModel.dismissProjectModal()
+            } else if (isMobileMenuOpen) {
+                isMobileMenuOpen = false
+            }
+        }
+        onDispose { cleanup() }
+    }
 
     LaunchedEffect(Unit) {
         document.title = "Hirarki Wendri · Mobile Developer Portfolio"
@@ -124,18 +161,23 @@ fun App() {
                 is PortfolioUiState.Success -> {
                     PortfolioPage(
                         uiState = state,
+                        isMobileMenuOpen = isMobileMenuOpen,
+                        onMenuToggle = { isMobileMenuOpen = it },
                         onProjectClick = { viewModel.selectProject(it) },
-                        onNavClick = { sectionId -> scrollToSection(sectionId) },
+                        onNavClick = { sectionId ->
+                            isMobileMenuOpen = false
+                            scrollToSection(sectionId)
+                        },
                         onDownloadCV = { downloadCV(state.profile.cvUrl) }
                     )
                 }
             }
 
-            // ProjectModal overlay
+            // ProjectModal overlay with polished entry/exit animation
             AnimatedVisibility(
                 visible = selectedProject != null,
-                enter = fadeIn(),
-                exit = fadeOut()
+                enter = fadeIn() + scaleIn(initialScale = 0.9f) + slideInVertically { it / 8 },
+                exit = fadeOut() + scaleOut(targetScale = 0.9f) + slideOutVertically { it / 8 }
             ) {
                 selectedProject?.let { project ->
                     ProjectModal(
@@ -151,11 +193,35 @@ fun App() {
 @Composable
 fun PortfolioPage(
     uiState: PortfolioUiState.Success,
+    isMobileMenuOpen: Boolean,
+    onMenuToggle: (Boolean) -> Unit,
     onProjectClick: (dev.hirarki.portfolio.data.model.ProjectModel) -> Unit,
     onNavClick: (String) -> Unit,
     onDownloadCV: () -> Unit
 ) {
     val scrollState = rememberScrollState()
+    val windowDimensions = rememberWindowDimensions()
+    val isMobile = windowDimensions.isMobile
+
+    // Active section tracking based on scroll offset
+    // Approximate breakpoints for sections in scroll offset
+    val activeSection by remember {
+        derivedStateOf {
+            val scrollY = scrollState.value
+            when {
+                scrollY < 500 -> "hero"
+                scrollY < 1200 -> "about"
+                scrollY < 2400 -> "projects"
+                scrollY < 3400 -> "services"
+                scrollY < 4600 -> "experience"
+                else -> "contact"
+            }
+        }
+    }
+
+    val isScrolled by remember {
+        derivedStateOf { scrollState.value > 100 }
+    }
 
     Box(
         modifier = Modifier
@@ -210,13 +276,29 @@ fun PortfolioPage(
             )
         }
 
-        // Fixed Top Navigation Bar
+        // Fixed Top Navigation Bar with active section & scroll styling
         NavBar(
+            activeSection = activeSection,
+            isScrolled = isScrolled,
+            isMobile = isMobile,
+            isMenuOpen = isMobileMenuOpen,
+            onMenuToggle = onMenuToggle,
             onNavClick = onNavClick,
             onDownloadCV = onDownloadCV,
             modifier = Modifier
                 .align(Alignment.TopStart)
                 .fillMaxWidth()
         )
+
+        // Mobile Fullscreen Menu overlay
+        if (isMobile) {
+            FullscreenMobileMenu(
+                isOpen = isMobileMenuOpen,
+                activeSection = activeSection,
+                onNavClick = onNavClick,
+                onDownloadCV = onDownloadCV,
+                onClose = { onMenuToggle(false) }
+            )
+        }
     }
 }

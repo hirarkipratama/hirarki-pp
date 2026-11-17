@@ -1,10 +1,13 @@
 package dev.hirarki.portfolio.ui.sections
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.slideInHorizontally
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -23,7 +26,11 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -39,6 +46,7 @@ import dev.hirarki.portfolio.ui.components.parseHexColor
 import dev.hirarki.portfolio.ui.theme.JetBrainsMonoFamily
 import dev.hirarki.portfolio.ui.theme.ObsidianColors
 import dev.hirarki.portfolio.ui.theme.PortfolioTypography
+import kotlinx.coroutines.delay
 
 @Composable
 fun ExperienceSection(
@@ -53,7 +61,7 @@ fun ExperienceSection(
             .padding(vertical = 80.dp)
     ) {
         val isDesktop = maxWidth >= 1024.dp
-        val horizontalPadding = if (maxWidth > 1200.dp) 80.dp else if (maxWidth > 768.dp) 40.dp else 24.dp
+        val horizontalPadding = if (maxWidth > 1200.dp) 120.dp else if (maxWidth > 600.dp) 48.dp else 20.dp
 
         Column(
             modifier = Modifier
@@ -92,6 +100,13 @@ private fun TimelineItem(
     val accentColor = parseHexColor(experience.accentColor)
     val isEven = index % 2 == 0
 
+    var visible by remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        delay(index * 120L)
+        visible = true
+    }
+
     if (isDesktop) {
         // Desktop: Row with [LeftContent | TimelineNode | RightContent]
         Row(
@@ -100,7 +115,11 @@ private fun TimelineItem(
         ) {
             if (isEven) {
                 // Card on left
-                Box(modifier = Modifier.weight(1f)) {
+                AnimatedVisibility(
+                    visible = visible,
+                    enter = fadeIn(tween(600)) + slideInHorizontally(tween(600)) { -it / 2 },
+                    modifier = Modifier.weight(1f)
+                ) {
                     ExperienceCard(experience = experience, accentColor = accentColor)
                 }
                 TimelineNode(
@@ -117,7 +136,11 @@ private fun TimelineItem(
                     accentColor = accentColor,
                     modifier = Modifier.width(60.dp)
                 )
-                Box(modifier = Modifier.weight(1f)) {
+                AnimatedVisibility(
+                    visible = visible,
+                    enter = fadeIn(tween(600)) + slideInHorizontally(tween(600)) { it / 2 },
+                    modifier = Modifier.weight(1f)
+                ) {
                     ExperienceCard(experience = experience, accentColor = accentColor)
                 }
             }
@@ -134,7 +157,11 @@ private fun TimelineItem(
                 accentColor = accentColor,
                 modifier = Modifier.width(32.dp)
             )
-            Box(modifier = Modifier.weight(1f)) {
+            AnimatedVisibility(
+                visible = visible,
+                enter = fadeIn(tween(600)) + slideInHorizontally(tween(600)) { it / 2 },
+                modifier = Modifier.weight(1f)
+            ) {
                 ExperienceCard(experience = experience, accentColor = accentColor)
             }
         }
