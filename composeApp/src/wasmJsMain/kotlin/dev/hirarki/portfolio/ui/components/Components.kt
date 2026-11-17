@@ -311,16 +311,3 @@ fun TerminalText(
         modifier = modifier
     )
 }
-
-// Stubs for upcoming phases
-@Composable
-fun ProjectCard() {}
-
-@Composable
-fun ProjectScreenshot() {}
-
-@Composable
-fun ScreenshotGallery() {}
-
-@Composable
-fun ProjectModal() {}
