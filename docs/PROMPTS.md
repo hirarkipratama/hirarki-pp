@@ -2,7 +2,7 @@
 > **Project:** Hirarki Wendri · Mobile Developer Portfolio  
 > **Stack:** Kotlin Multiplatform + Compose Multiplatform (wasmJs Web only)  
 > **Design:** Obsidian Cyber-Core (Dark) · Stitch Project `11677376707151998401`  
-> **Reference:** `PLAN.md` · `ARCHITECTURE.md` · `portfolio_prd_project_brief.md`
+> **Reference:** `docs/PLAN.md` · `docs/ARCHITECTURE.md` · `docs/portfolio_prd_project_brief.md`
 
 Use each prompt block in sequence. Each prompt is self-contained with context.  
 Run prompts inside your AI coding assistant (Antigravity/Cursor/etc.) from the project root.
@@ -293,75 +293,72 @@ Each component must:
 
 ```
 Populate all JSON CMS asset files in
-`composeApp/src/commonMain/resources/assets/data/` with real portfolio content
-based on the PRD in `portfolio_prd_project_brief.md`.
+`composeApp/src/commonMain/resources/assets/data/` (or resources/assets/data) with real portfolio content
+based on the developer's CV, project portfolio docs, and existing local screenshot assets.
 
 IMPORTANT — Local Asset Conventions:
-- All images are stored locally under `assets/images/`
-- Project images live under `assets/images/projects/<slug>/`
-- Each project has a `banner.webp` (multi-screenshot composite) AND
-  individual portrait mobile screenshot files (screen_*.webp)
-- ALL screenshots are PORTRAIT mobile screenshots (never landscape crops)
-- The developer provides real screenshot files — do NOT invent image paths
-  that don't correspond to real files
+- Local assets are placed under `assets/`
+- Profile image: `assets/profile.webp`
+- Project screenshots live under `assets/projects/<slug>/screen-XX.webp`
+- ALL screenshots are portrait mobile screenshots from real project assets
+- Do NOT invent image paths that don't correspond to real files
 
-1. **profile.json** — Use this exact structure:
+1. **profile.json** — Real profile based on CV:
 {
-  "name": "Hirarki Ardi Pratama Wendri",
-  "title": "Middle Mobile Developer",
-  "tagline": "Engineering Scalable High-Performance Mobile Experiences",
-  "location": "Jakarta, Indonesia",
-  "email": "hirarki@example.com",
-  "whatsapp": "+62811000000",
+  "name": "Hirarki Ardi Pratama",
+  "title": "Senior Mobile Developer (Flutter & Android)",
+  "tagline": "Engineering High-Performance, Resilient Cross-Platform Mobile Experiences",
+  "location": "Jakarta Selatan, Indonesia",
+  "email": "hirarki.pratama@gmail.com",
+  "whatsapp": "+62895800267596",
   "github": "https://github.com/hirarki",
-  "linkedin": "https://linkedin.com/in/hirarki",
-  "twitter": "https://twitter.com/hirarki",
+  "linkedin": "https://linkedin.com/in/hirarki-pratama",
+  "twitter": "",
   "cvUrl": "/assets/cv/hirarki_cv.pdf",
-  "avatarUrl": "/assets/images/avatar.webp",
-  "heroSubheadline": "Specialized in Flutter · Kotlin · Swift · BLoC · Clean Architecture",
+  "avatarUrl": "assets/profile.webp",
+  "heroSubheadline": "Specialized in Flutter · Kotlin · BLoC/Cubit · Clean Architecture · Real-time RTC",
   "metrics": [
-    { "label": "Years Experience", "value": 4, "suffix": "+" },
-    { "label": "Apps Shipped", "value": 5, "suffix": "+" },
+    { "label": "Years Experience", "value": 5, "suffix": "+" },
+    { "label": "Active Users Served", "value": 50, "suffix": "k+" },
     { "label": "Crash-Free Sessions", "value": 99.8, "suffix": "%" },
-    { "label": "Critical CVEs", "value": 0, "suffix": "" }
+    { "label": "Code Reusability Boost", "value": 35, "suffix": "%" }
   ],
-  "stackChips": ["Flutter 3.x", "Kotlin & Compose", "BLoC", "Clean Architecture", "Swift"]
+  "stackChips": ["Flutter & Dart", "Kotlin & Android", "BLoC / Cubit", "Clean Architecture", "Agora RTC & WebSockets"]
 }
 
-2. **projects.json** — Array of 4 projects: PayPulse, CareSync, AuraStore, LogiRoute.
-   Use this EXACT expanded schema for each project (required by the showcase spec):
+2. **projects.json** — Array of 4 real projects matching assets in `assets/projects/` and portfolio details:
 
 [
   {
-    "slug": "paypulse",
-    "title": "PayPulse",
-    "category": "Neobank & Crypto Mobile Wallet",
-    "summary": "Real-time crypto wallet with QRIS cross-border payments and biometric KYC.",
-    "problem": "Users needed a single app for fiat and crypto with compliant KYC and instant cross-border QR payments.",
-    "solution": "Built a Flutter/Kotlin app with WebSocket crypto feeds, QRIS gateway integration, and hardware-backed biometric KYC flows.",
-    "impact": null,
-    "bannerUrl": "/assets/images/projects/paypulse/banner.webp",
+    "slug": "dengerind",
+    "title": "Dengerind",
+    "category": "Mental Health & Teleconsultation",
+    "summary": "24/7 mental health platform featuring real-time counseling chat, VoIP calls, and low-latency video conferencing.",
+    "problem": "Modern individuals face high barriers and scheduling friction when seeking immediate, private mental health support and professional psychological guidance.",
+    "solution": "Built an interactive cross-platform mobile application with Agora RTC for low-latency video consultations and VoIP calls, end-to-end encrypted chat, and appointment scheduling.",
+    "impact": "Supported thousands of concurrent user sessions with smooth multi-modal real-time teleconsultation.",
+    "bannerUrl": "assets/projects/dengerind/screen-01.webp",
     "screenshots": [
       {
-        "image": "/assets/images/projects/paypulse/screen_home.webp",
-        "alt": "PayPulse home screen showing crypto portfolio balance and market overview",
-        "caption": "Portfolio Overview"
+        "image": "assets/projects/dengerind/screen-01.webp",
+        "alt": "Dengerind home screen showing teleconsultation options, counseling topics, and counselor lists",
+        "caption": "Consultation Home"
       },
       {
-        "image": "/assets/images/projects/paypulse/screen_wallet.webp",
-        "alt": "PayPulse wallet screen with QRIS payment QR code and transaction history",
-        "caption": "QRIS Wallet"
+        "image": "assets/projects/dengerind/screen-02.webp",
+        "alt": "Dengerind appointment and counselor profile screen with real-time availability and booking",
+        "caption": "Counselor Profile & Booking"
       },
       {
-        "image": "/assets/images/projects/paypulse/screen_transaction.webp",
-        "alt": "PayPulse transaction detail screen with biometric confirmation prompt",
-        "caption": "Biometric Confirm"
+        "image": "assets/projects/dengerind/screen-03.webp",
+        "alt": "Dengerind real-time counseling chat session screen with interactive messaging",
+        "caption": "Counseling Session"
       }
     ],
-    "technologies": ["Flutter 3.x", "Kotlin", "WebSocket", "QRIS", "Biometrics", "Firebase"],
+    "technologies": ["Flutter", "Dart", "Agora RTC", "Firebase", "GetX"],
     "metrics": [
-      { "label": "Real-time Feed Latency", "value": "< 50ms" },
-      { "label": "KYC Completion Rate", "value": "94%" }
+      { "label": "Availability", "value": "24/7" },
+      { "label": "Streaming", "value": "Low-Latency RTC" }
     ],
     "accentColor": "#00F0FF",
     "platform": ["Android", "iOS"],
@@ -370,97 +367,117 @@ IMPORTANT — Local Asset Conventions:
     "featured": true
   },
   {
-    "slug": "caresync",
-    "title": "CareSync",
-    "category": "Telehealth & Vitals Monitoring",
-    "summary": "Native Android app synchronizing BLE IoT medical sensors with HL7 FHIR compliance.",
-    "problem": "Healthcare providers needed a compliant mobile tool to monitor patient vitals from BLE sensors and conduct WebRTC video consultations.",
-    "solution": "Developed a Jetpack Compose app with low-energy BLE sensor sync, WebRTC consultation rooms, and HL7 FHIR data export.",
-    "impact": null,
-    "bannerUrl": "/assets/images/projects/caresync/banner.webp",
+    "slug": "sai-coworking",
+    "title": "SaicoWork",
+    "category": "Smart Coworking & Office Management",
+    "summary": "Smart coworking and workspace booking application managing 13 branch locations with QR check-in and push alerts.",
+    "problem": "Freelancers, startups, and enterprise clients needed an efficient, unified way to discover facilities, reserve on-demand meeting rooms, and access workspaces across multi-city locations.",
+    "solution": "Engineered an enterprise coworking platform with on-demand room reservations, digital QR access control, automated member perk distribution, and OneSignal push notifications.",
+    "impact": "Seamlessly managed booking workflows and digital access control across 13 office locations.",
+    "bannerUrl": "assets/projects/sai-coworking/screen-01.webp",
     "screenshots": [
       {
-        "image": "/assets/images/projects/caresync/screen_dashboard.webp",
-        "alt": "CareSync dashboard showing patient vitals cards with real-time BLE sensor data",
-        "caption": "Vitals Dashboard"
+        "image": "assets/projects/sai-coworking/screen-01.webp",
+        "alt": "SaicoWork locations and available workspace overview screen",
+        "caption": "Workspace Explorer"
       },
       {
-        "image": "/assets/images/projects/caresync/screen_vitals.webp",
-        "alt": "CareSync vitals detail screen with heart rate, SpO2 and temperature charts",
-        "caption": "Sensor Detail"
+        "image": "assets/projects/sai-coworking/screen-02.webp",
+        "alt": "SaicoWork meeting room details and on-demand reservation screen",
+        "caption": "Room Booking"
+      },
+      {
+        "image": "assets/projects/sai-coworking/screen-03.webp",
+        "alt": "SaicoWork user pass, active reservations, and QR access check-in screen",
+        "caption": "QR Pass & Perks"
       }
     ],
-    "technologies": ["Kotlin", "Jetpack Compose", "BLE", "WebRTC", "HL7 FHIR", "Room"],
+    "technologies": ["Flutter", "Firebase", "GetX", "OneSignal"],
     "metrics": [
-      { "label": "BLE Sync Interval", "value": "250ms" },
-      { "label": "Uptime", "value": "99.9%" }
+      { "label": "Locations", "value": "13 Cities" },
+      { "label": "Access", "value": "QR Check-in" }
     ],
     "accentColor": "#FF007A",
-    "platform": ["Android"],
+    "platform": ["Android", "iOS"],
     "githubUrl": null,
     "caseStudyUrl": null,
     "featured": true
   },
   {
-    "slug": "aurastore",
-    "title": "AuraStore",
-    "category": "Luxury Fashion & AR Fitting",
-    "summary": "iOS e-commerce app with real-time AR product try-on and 120Hz micro-interactions.",
-    "problem": "Luxury buyers wanted to virtually try on fashion items before purchase without visiting a physical store.",
-    "solution": "Built a Swift/SwiftUI app with ARKit real-time try-on, Stripe Apple Pay integration, and 120Hz spring-animated transitions.",
-    "impact": null,
-    "bannerUrl": "/assets/images/projects/aurastore/banner.webp",
+    "slug": "iwwi-maintenance",
+    "title": "IWWI Maintenance",
+    "category": "Industrial Facility & Machine Maintenance",
+    "summary": "Industrial maintenance management system featuring machine health monitoring, detailed equipment registry, and QR asset tracking.",
+    "problem": "Industrial facilities struggled with manual tracking of complex machinery specifications, maintenance schedules, and equipment downtime identification.",
+    "solution": "Developed an Android maintenance app with advanced equipment registration forms, real-time machine health monitoring dashboards, and instant QR code scanning for physical asset identification.",
+    "impact": "Streamlined maintenance operations, resource allocation, and equipment lifecycle tracking.",
+    "bannerUrl": "assets/projects/iwwi-maintenance/screen-01.webp",
     "screenshots": [
       {
-        "image": "/assets/images/projects/aurastore/screen_home.webp",
-        "alt": "AuraStore home screen featuring luxury fashion product grid with editorial layout",
-        "caption": "Editorial Home"
+        "image": "assets/projects/iwwi-maintenance/screen-01.webp",
+        "alt": "IWWI machinery registration and specification details input screen",
+        "caption": "Equipment Registry"
       },
       {
-        "image": "/assets/images/projects/aurastore/screen_ar.webp",
-        "alt": "AuraStore AR fitting screen showing real-time virtual try-on of a fashion item",
-        "caption": "AR Try-On"
+        "image": "assets/projects/iwwi-maintenance/screen-02.webp",
+        "alt": "IWWI real-time machine performance monitoring and telemetry status dashboard",
+        "caption": "Monitoring Dashboard"
+      },
+      {
+        "image": "assets/projects/iwwi-maintenance/screen-03.webp",
+        "alt": "IWWI rapid QR scanner interface for equipment lookup and maintenance logs",
+        "caption": "QR Code Scanning"
       }
     ],
-    "technologies": ["Swift", "SwiftUI", "ARKit", "Stripe", "Apple Pay", "Combine"],
+    "technologies": ["Kotlin", "Android SDK", "Firebase", "QR Code Scanning"],
     "metrics": [
-      { "label": "AR Frame Rate", "value": "120 FPS" },
-      { "label": "Checkout Conversion", "value": "+28%" }
+      { "label": "Identification", "value": "Instant QR Scan" },
+      { "label": "Monitoring", "value": "Real-time" }
     ],
     "accentColor": "#00F0FF",
-    "platform": ["iOS"],
+    "platform": ["Android"],
     "githubUrl": null,
     "caseStudyUrl": null,
     "featured": true
   },
   {
-    "slug": "logiroute",
-    "title": "LogiRoute",
-    "category": "Driver Fleet & Realtime Dispatch",
-    "summary": "High-scale driver app with turn-by-turn navigation and battery-efficient background telemetry.",
-    "problem": "Fleet managers needed real-time driver location and route optimization without excessive battery drain on driver devices.",
-    "solution": "Built a Kotlin/Compose app with Fused Location API, WorkManager background telemetry, and ML-based route optimization.",
-    "impact": null,
-    "bannerUrl": "/assets/images/projects/logiroute/banner.webp",
+    "slug": "perfect-assistant",
+    "title": "Perfect Assistant",
+    "category": "Enterprise Task & Lifestyle Management",
+    "summary": "Personal & enterprise productivity assistant app streamlining schedules, smart task tracking, and priority workflows.",
+    "problem": "Professionals require an intuitive, low-latency mobile tool to organize daily complex tasks, personal routines, and priority-driven timelines.",
+    "solution": "Built a fluid, responsive mobile assistant delivering intuitive task management, calendar coordination, and real-time alerts.",
+    "impact": "Delivered smooth user experience with high responsiveness and automated reminders.",
+    "bannerUrl": "assets/projects/perfect-assistant/screen-01.webp",
     "screenshots": [
       {
-        "image": "/assets/images/projects/logiroute/screen_map.webp",
-        "alt": "LogiRoute map screen showing driver route with turn-by-turn directions overlay",
-        "caption": "Route Navigation"
+        "image": "assets/projects/perfect-assistant/screen-01.webp",
+        "alt": "Perfect Assistant daily agenda and task overview screen",
+        "caption": "Daily Dashboard"
       },
       {
-        "image": "/assets/images/projects/logiroute/screen_dispatch.webp",
-        "alt": "LogiRoute dispatch screen showing active deliveries list with status indicators",
-        "caption": "Dispatch Board"
+        "image": "assets/projects/perfect-assistant/screen-02.webp",
+        "alt": "Perfect Assistant task detail and schedule creation screen",
+        "caption": "Schedule Planning"
+      },
+      {
+        "image": "assets/projects/perfect-assistant/screen-03.webp",
+        "alt": "Perfect Assistant calendar integration and milestone tracking screen",
+        "caption": "Calendar & Milestones"
+      },
+      {
+        "image": "assets/projects/perfect-assistant/screen-04.webp",
+        "alt": "Perfect Assistant reminders, user settings, and productivity analytics screen",
+        "caption": "Analytics & Alerts"
       }
     ],
-    "technologies": ["Kotlin", "Jetpack Compose", "Fused Location", "WorkManager", "Maps SDK", "WebSocket"],
+    "technologies": ["Flutter", "Dart", "Clean Architecture", "Local Storage"],
     "metrics": [
-      { "label": "Battery Reduction", "value": "40%" },
-      { "label": "ETA Accuracy", "value": "96%" }
+      { "label": "UI Performance", "value": "60 FPS" },
+      { "label": "Task Sync", "value": "Instant" }
     ],
     "accentColor": "#FF007A",
-    "platform": ["Android"],
+    "platform": ["Android", "iOS"],
     "githubUrl": null,
     "caseStudyUrl": null,
     "featured": true
@@ -468,38 +485,138 @@ IMPORTANT — Local Asset Conventions:
 ]
 
    RULES for project data:
-   - Do NOT invent metrics, App Store links, client names, or business outcomes
+   - Match slugs and screenshot paths directly to files in `assets/projects/`
    - Set "impact": null if no verified data is available
    - Set "githubUrl": null — only populate when real repo URL exists
    - Set "caseStudyUrl": null — only populate when a real case study link exists
    - Only include screenshots[] entries for image files that actually exist in assets/
    - Every screenshot MUST have meaningful alt text describing what is visible on screen
 
-3. **experiences.json** — Array of 3 experiences from the PRD career section.
-   Each has: id, role, company, companyType, period, description,
-   achievements[], current (bool), accentColor
+3. **experiences.json** — Array of professional experiences from CV:
+[
+  {
+    "id": "axa-mandiri",
+    "role": "Senior Mobile Developer (Flutter)",
+    "company": "AXA Mandiri",
+    "companyType": "Financial Services & Insurance",
+    "period": "Nov 2022 – Present",
+    "description": "Architected and maintained enterprise mobile applications handling daily financial transactions and policy lifecycle operations for 50,000+ policyholders and financial advisors.",
+    "achievements": [
+      "Applied Clean Architecture and modular state management (BLoC/GetX), increasing code reusability by 35% and accelerating release turnaround times",
+      "Implemented biometric authentication, dynamic token refresh, and certificate pinning for strict financial compliance",
+      "Optimized 30+ REST API endpoints and caching, cutting data consumption by 20% and improving screen load speeds by 40%",
+      "Integrated Crashlytics and performance monitoring, maintaining a 99.8% crash-free session rate across release cycles"
+    ],
+    "current": true,
+    "accentColor": "#00F0FF"
+  },
+  {
+    "id": "ragdalion",
+    "role": "Mobile Developer (Flutter & Cross-Platform)",
+    "company": "PT Ragdalion Revolusi Industri",
+    "companyType": "Software House & IoT Solutions",
+    "period": "Mar 2021 – Sep 2022",
+    "description": "Engineered and delivered robust mobile applications serving healthcare, co-working, and industrial automation clients from requirements to deployment.",
+    "achievements": [
+      "Built Dengerind mental health platform with Agora RTC for low-latency video consultations and real-time chat supporting thousands of concurrent users",
+      "Engineered SaicoWork coworking booking, QR check-in, and push notifications across 13 locations using Flutter, Firebase, and GetX",
+      "Developed OkeDok healthcare app with appointment booking and prescription tracking across diverse screen densities",
+      "Standardized API handling layers with Dio and interceptors with centralized error recovery and automated retry logic"
+    ],
+    "current": false,
+    "accentColor": "#FF007A"
+  },
+  {
+    "id": "maestro",
+    "role": "Mobile Developer",
+    "company": "PT Maestro Manajemen Nusantara",
+    "companyType": "Enterprise & Education Management",
+    "period": "Feb 2020 – Feb 2021",
+    "description": "Developed mobile and backend solutions streamlining enterprise attendance and school operations.",
+    "achievements": [
+      "Developed automated school attendance tracking application managing records for 1,000+ students and teachers",
+      "Built RESTful APIs using PHP/Lumen and optimized MySQL database queries for real-time mobile sync",
+      "Cut initial app launch latency by 25% through systematic debugging, unit testing, and memory leak resolution"
+    ],
+    "current": false,
+    "accentColor": "#00F0FF"
+  }
+]
 
-4. **services.json** — Array of 4 services from section 3.6 of the PRD.
-   Each has: id, title, description, features[], iconKey (string identifier)
+4. **services.json** — Array of service offerings:
+[
+  {
+    "id": "cross-platform-dev",
+    "title": "Cross-Platform Mobile Engineering",
+    "description": "Production-ready Flutter & Android applications built with Clean Architecture, modular structure, and fluid 60fps animations.",
+    "features": [
+      "Flutter & Dart development for Android and iOS",
+      "Enterprise state management (BLoC, Cubit, GetX)",
+      "Adaptive UI for diverse screen densities & tablets"
+    ],
+    "iconKey": "mobile"
+  },
+  {
+    "id": "fintech-security",
+    "title": "FinTech Security & Hardening",
+    "description": "Enterprise-grade mobile security protocols compliant with financial regulations and secure transaction standards.",
+    "features": [
+      "Biometric authentication & secure hardware key storage",
+      "SSL/TLS Certificate Pinning & dynamic token rotation",
+      "Encrypted local storage & sensitive data masking"
+    ],
+    "iconKey": "shield"
+  },
+  {
+    "id": "realtime-rtc",
+    "title": "Real-time Teleconsultation & IoT",
+    "description": "Low-latency voice, video, and data streaming for telehealth, chat, and connected hardware platforms.",
+    "features": [
+      "Agora RTC audio/video conferencing & VoIP",
+      "WebSockets & real-time messaging protocols",
+      "QR code scanning & hardware peripheral integration"
+    ],
+    "iconKey": "rtc"
+  },
+  {
+    "id": "perf-optimization",
+    "title": "Performance Profiling & CI/CD",
+    "description": "Full-cycle app stabilization, memory leak debugging, automated testing, and automated store deployments.",
+    "features": [
+      "Flutter DevTools profiling (CPU, memory, frame rendering)",
+      "Automated unit, widget, and integration testing",
+      "CI/CD pipelines with GitHub Actions & Fastlane"
+    ],
+    "iconKey": "speed"
+  }
+]
 
-5. **skills.json** — Categories object:
+5. **skills.json** — Categories object aligned with CV:
 {
   "categories": [
     {
-      "name": "Mobile Frameworks",
-      "skills": ["Flutter 3.x", "Dart", "Kotlin", "Jetpack Compose", "Swift"]
+      "name": "Languages & Core",
+      "skills": ["Dart", "Kotlin", "Java", "PHP", "SQL"]
     },
     {
-      "name": "State & Architecture",
-      "skills": ["BLoC", "Riverpod", "MVVM", "StateFlow", "Clean Architecture"]
+      "name": "Mobile Frameworks & SDKs",
+      "skills": ["Flutter SDK", "Android SDK", "Material Design", "Cupertino"]
     },
     {
-      "name": "Backend & Storage",
-      "skills": ["Firebase", "Supabase", "REST/Dio", "GraphQL", "SQLite", "Hive/Isar"]
+      "name": "State Management & Architecture",
+      "skills": ["BLoC / Cubit", "GetX", "Provider", "Clean Architecture", "MVVM", "Modular Architecture"]
     },
     {
-      "name": "Testing & CI/CD",
-      "skills": ["Unit Tests", "Widget Tests", "GitHub Actions", "Fastlane", "Sentry"]
+      "name": "APIs & Real-Time Services",
+      "skills": ["RESTful APIs (Dio)", "WebSocket", "Agora RTC (Video/Audio)", "Firebase (FCM, Crashlytics, Auth)", "OneSignal"]
+    },
+    {
+      "name": "Local Storage & Databases",
+      "skills": ["SQLite / SQFlite", "Hive", "Secure Storage", "SharedPreferences", "MySQL"]
+    },
+    {
+      "name": "Testing, Tooling & DevOps",
+      "skills": ["Unit Testing", "Widget Testing", "Flutter DevTools Profiling", "GitHub Actions", "Fastlane", "Google Play Console", "App Store Connect"]
     }
   ]
 }
