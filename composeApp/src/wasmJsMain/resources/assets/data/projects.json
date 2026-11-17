@@ -25,13 +25,28 @@
         "caption": "Counseling Session"
       }
     ],
-    "technologies": ["Flutter", "Dart", "Agora RTC", "Firebase", "GetX"],
+    "technologies": [
+      "Flutter",
+      "Dart",
+      "Agora RTC",
+      "Firebase",
+      "GetX"
+    ],
     "metrics": [
-      { "label": "Availability", "value": "24/7" },
-      { "label": "Streaming", "value": "Low-Latency RTC" }
+      {
+        "label": "Availability",
+        "value": "24/7"
+      },
+      {
+        "label": "Streaming",
+        "value": "Low-Latency RTC"
+      }
     ],
     "accentColor": "#00F0FF",
-    "platform": ["Android", "iOS"],
+    "platform": [
+      "Android",
+      "iOS"
+    ],
     "githubUrl": null,
     "caseStudyUrl": null,
     "featured": true
@@ -62,13 +77,27 @@
         "caption": "QR Pass & Perks"
       }
     ],
-    "technologies": ["Flutter", "Firebase", "GetX", "OneSignal"],
+    "technologies": [
+      "Flutter",
+      "Firebase",
+      "GetX",
+      "OneSignal"
+    ],
     "metrics": [
-      { "label": "Locations", "value": "13 Cities" },
-      { "label": "Access", "value": "QR Check-in" }
+      {
+        "label": "Locations",
+        "value": "13 Cities"
+      },
+      {
+        "label": "Access",
+        "value": "QR Check-in"
+      }
     ],
     "accentColor": "#FF007A",
-    "platform": ["Android", "iOS"],
+    "platform": [
+      "Android",
+      "iOS"
+    ],
     "githubUrl": null,
     "caseStudyUrl": null,
     "featured": true
@@ -99,13 +128,26 @@
         "caption": "QR Code Scanning"
       }
     ],
-    "technologies": ["Kotlin", "Android SDK", "Firebase", "QR Code Scanning"],
+    "technologies": [
+      "Kotlin",
+      "Android SDK",
+      "Firebase",
+      "QR Code Scanning"
+    ],
     "metrics": [
-      { "label": "Identification", "value": "Instant QR Scan" },
-      { "label": "Monitoring", "value": "Real-time" }
+      {
+        "label": "Identification",
+        "value": "Instant QR Scan"
+      },
+      {
+        "label": "Monitoring",
+        "value": "Real-time"
+      }
     ],
     "accentColor": "#00F0FF",
-    "platform": ["Android"],
+    "platform": [
+      "Android"
+    ],
     "githubUrl": null,
     "caseStudyUrl": null,
     "featured": true
@@ -141,13 +183,29 @@
         "caption": "Analytics & Alerts"
       }
     ],
-    "technologies": ["Flutter", "Dart", "Clean Architecture", "Local Storage"],
+    "technologies": [
+      "Kotlin",
+      "MVVM",
+      "Koin",
+      "Room Database",
+      "Coroutines",
+      "Flow",
+      "Jetpack Compose"
+    ],
     "metrics": [
-      { "label": "UI Performance", "value": "60 FPS" },
-      { "label": "Task Sync", "value": "Instant" }
+      {
+        "label": "UI Performance",
+        "value": "60 FPS"
+      },
+      {
+        "label": "Task Sync",
+        "value": "Instant"
+      }
     ],
     "accentColor": "#FF007A",
-    "platform": ["Android", "iOS"],
+    "platform": [
+      "Android"
+    ],
     "githubUrl": null,
     "caseStudyUrl": null,
     "featured": true
