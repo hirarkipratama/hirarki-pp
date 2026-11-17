@@ -2,6 +2,7 @@ package dev.hirarki.portfolio.ui.sections
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -28,9 +29,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import dev.hirarki.portfolio.data.model.ProfileModel
 import dev.hirarki.portfolio.ui.components.GlowCard
 import dev.hirarki.portfolio.ui.components.NeonButton
@@ -39,8 +41,19 @@ import dev.hirarki.portfolio.ui.components.SectionHeader
 import dev.hirarki.portfolio.ui.theme.JetBrainsMonoFamily
 import dev.hirarki.portfolio.ui.theme.ObsidianColors
 import dev.hirarki.portfolio.ui.theme.PortfolioTypography
+import kmp_mobile_portofolio.composeapp.generated.resources.Res
+import kmp_mobile_portofolio.composeapp.generated.resources.ic_arrow_up
+import kmp_mobile_portofolio.composeapp.generated.resources.ic_chat
+import kmp_mobile_portofolio.composeapp.generated.resources.ic_download
+import kmp_mobile_portofolio.composeapp.generated.resources.ic_github
+import kmp_mobile_portofolio.composeapp.generated.resources.ic_linkedin
+import kmp_mobile_portofolio.composeapp.generated.resources.ic_location
+import kmp_mobile_portofolio.composeapp.generated.resources.ic_mail
+import kmp_mobile_portofolio.composeapp.generated.resources.ic_x
 import kotlinx.browser.document
 import kotlinx.browser.window
+import org.jetbrains.compose.resources.DrawableResource
+import org.jetbrains.compose.resources.painterResource
 import org.w3c.dom.HTMLAnchorElement
 
 fun downloadCV(url: String) {
@@ -114,7 +127,7 @@ fun ContactSection(
                     // Contact Rows
                     if (profile.email.isNotBlank()) {
                         ContactRow(
-                            icon = "📧",
+                            icon = Res.drawable.ic_mail,
                             title = "Email",
                             value = profile.email,
                             onClick = { window.open("mailto:${profile.email}", "_blank") }
@@ -124,7 +137,7 @@ fun ContactSection(
                     if (profile.whatsapp.isNotBlank()) {
                         val waClean = profile.whatsapp.replace("+", "").replace(" ", "").replace("-", "")
                         ContactRow(
-                            icon = "💬",
+                            icon = Res.drawable.ic_chat,
                             title = "WhatsApp",
                             value = "Chat on WhatsApp",
                             onClick = { window.open("https://wa.me/$waClean", "_blank") }
@@ -133,7 +146,7 @@ fun ContactSection(
 
                     if (profile.location.isNotBlank()) {
                         ContactRow(
-                            icon = "📍",
+                            icon = Res.drawable.ic_location,
                             title = "Location",
                             value = profile.location,
                             onClick = null
@@ -157,7 +170,7 @@ fun ContactSection(
                         if (profile.github.isNotBlank()) {
                             SocialButton(
                                 label = "GitHub",
-                                icon = "🐙",
+                                icon = Res.drawable.ic_github,
                                 onClick = { window.open(profile.github, "_blank") }
                             )
                         }
@@ -165,7 +178,7 @@ fun ContactSection(
                         if (profile.linkedin.isNotBlank()) {
                             SocialButton(
                                 label = "LinkedIn",
-                                icon = "💼",
+                                icon = Res.drawable.ic_linkedin,
                                 onClick = { window.open(profile.linkedin, "_blank") }
                             )
                         }
@@ -173,7 +186,7 @@ fun ContactSection(
                         if (profile.twitter.isNotBlank()) {
                             SocialButton(
                                 label = "Twitter",
-                                icon = "🐦",
+                                icon = Res.drawable.ic_x,
                                 onClick = { window.open(profile.twitter, "_blank") }
                             )
                         }
@@ -187,10 +200,18 @@ fun ContactSection(
                 contentAlignment = Alignment.Center
             ) {
                 NeonButton(
-                    text = "⬇ Download My CV",
+                    text = "Download My CV",
                     onClick = { downloadCV(profile.cvUrl) },
                     variant = NeonButtonVariant.PRIMARY,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    icon = {
+                        Image(
+                            painter = painterResource(Res.drawable.ic_download),
+                            contentDescription = null,
+                            modifier = Modifier.size(18.dp),
+                            colorFilter = ColorFilter.tint(Color.Black)
+                        )
+                    }
                 )
             }
 
@@ -218,14 +239,25 @@ fun ContactSection(
                         style = PortfolioTypography.labelMedium.copy(color = ObsidianColors.OnSurfaceDim)
                     )
 
-                    Text(
-                        text = "Back to Top ↑",
-                        style = PortfolioTypography.labelMedium.copy(
-                            color = ObsidianColors.Primary,
-                            fontWeight = FontWeight.SemiBold
-                        ),
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),
                         modifier = Modifier.clickable(onClick = onBackToTopClick)
-                    )
+                    ) {
+                        Text(
+                            text = "Back to Top",
+                            style = PortfolioTypography.labelMedium.copy(
+                                color = ObsidianColors.Primary,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                        )
+                        Image(
+                            painter = painterResource(Res.drawable.ic_arrow_up),
+                            contentDescription = null,
+                            modifier = Modifier.size(14.dp),
+                            colorFilter = ColorFilter.tint(ObsidianColors.Primary)
+                        )
+                    }
                 }
             }
         }
@@ -234,7 +266,7 @@ fun ContactSection(
 
 @Composable
 private fun ContactRow(
-    icon: String,
+    icon: DrawableResource,
     title: String,
     value: String,
     onClick: (() -> Unit)?
@@ -250,7 +282,12 @@ private fun ContactRow(
         horizontalArrangement = Arrangement.spacedBy(14.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(text = icon, fontSize = 20.sp)
+        Image(
+            painter = painterResource(icon),
+            contentDescription = null,
+            modifier = Modifier.size(20.dp),
+            colorFilter = ColorFilter.tint(ObsidianColors.Primary)
+        )
         Column {
             Text(
                 text = title,
@@ -270,7 +307,7 @@ private fun ContactRow(
 @Composable
 private fun SocialButton(
     label: String,
-    icon: String,
+    icon: DrawableResource,
     onClick: () -> Unit
 ) {
     val interactionSource = remember { MutableInteractionSource() }
@@ -299,6 +336,13 @@ private fun SocialButton(
             ),
         contentAlignment = Alignment.Center
     ) {
-        Text(text = icon, fontSize = 18.sp)
+        Image(
+            painter = painterResource(icon),
+            contentDescription = label,
+            modifier = Modifier.size(20.dp),
+            colorFilter = ColorFilter.tint(
+                if (isHovered) ObsidianColors.Primary else ObsidianColors.OnSurface
+            )
+        )
     }
 }

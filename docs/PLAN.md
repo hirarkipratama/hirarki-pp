@@ -77,23 +77,19 @@ kmp-mobile-portofolio/
 │   │   │           │       ├── ServicesSection.kt
 │   │   │           │       ├── ExperienceSection.kt
 │   │   │           │       └── ContactSection.kt
-│   │   └── commonMain/
+│   │   ├── commonMain/
+│   │   │   └── composeResources/
+│   │   │       └── drawable/                ← vector icons (Res.drawable.*)
+│   │   └── wasmJsMain/
 │   │       └── resources/
-│   │           ├── assets/
-│   │           │   ├── data/
-│   │           │   │   ├── profile.json       ← CMS: personal info
-│   │           │   │   ├── projects.json      ← CMS: case studies
-│   │           │   │   ├── experiences.json   ← CMS: career timeline
-│   │           │   │   ├── services.json      ← CMS: capability cards
-│   │           │   │   └── skills.json        ← CMS: tech pills
-│   │           │   ├── images/
-│   │           │   │   ├── avatar.webp
-│   │           │   │   └── projects/          ← project thumbnails
-│   │           │   └── cv/
-│   │           │       └── hirarki_cv.pdf     ← downloadable resume
-│   │           └── fonts/
-│   │               ├── SpaceGrotesk-*.woff2
-│   │               └── JetBrainsMono-*.woff2
+│   │           ├── index.html
+│   │           ├── favicon.svg
+│   │           └── assets/
+│   │               ├── data/
+│   │               │   └── profile.json / projects.json / experiences.json / services.json / skills.json
+│   │               ├── profile.webp
+│   │               ├── projects/<slug>/screen-XX.webp
+│   │               └── cv/hirarki_cv.pdf     ← downloadable resume
 │   └── build.gradle.kts
 ├── gradle/
 │   ├── libs.versions.toml             ← version catalog
@@ -146,76 +142,64 @@ kmp-mobile-portofolio/
 ### `profile.json`
 ```json
 {
-  "name": "Hirarki Ardi Pratama Wendri",
-  "title": "Middle Mobile Developer",
-  "tagline": "Engineering Scalable High-Performance Mobile Experiences",
-  "location": "Jakarta, Indonesia",
-  "email": "hirarki@example.com",
-  "whatsapp": "+62xxx",
+  "name": "Hirarki Ardi Pratama",
+  "title": "Senior Mobile Developer (Flutter & Android)",
+  "tagline": "Engineering High-Performance, Resilient Cross-Platform Mobile Experiences",
+  "location": "Jakarta Selatan, Indonesia",
+  "email": "hirarki.pratama@gmail.com",
+  "whatsapp": "+62895800267596",
   "github": "https://github.com/hirarki",
-  "linkedin": "https://linkedin.com/in/hirarki",
-  "twitter": "https://twitter.com/hirarki",
+  "linkedin": "https://linkedin.com/in/hirarki-pratama",
+  "twitter": "",
   "cvUrl": "/assets/cv/hirarki_cv.pdf",
-  "avatarUrl": "/assets/images/avatar.webp",
+  "avatarUrl": "assets/profile.webp",
+  "heroSubheadline": "Specialized in Flutter · Kotlin · BLoC/Cubit · Clean Architecture · Real-time RTC",
   "metrics": [
-    { "label": "Years Experience", "value": 4, "suffix": "+" },
-    { "label": "Apps Shipped", "value": 5, "suffix": "+" },
+    { "label": "Years Experience", "value": 5.0, "suffix": "+" },
+    { "label": "Active Users Served", "value": 50.0, "suffix": "k+" },
     { "label": "Crash-Free Sessions", "value": 99.8, "suffix": "%" },
-    { "label": "Critical CVEs", "value": 0, "suffix": "" }
-  ]
+    { "label": "Code Reusability Boost", "value": 35.0, "suffix": "%" }
+  ],
+  "stackChips": ["Flutter & Dart", "Kotlin & Android", "BLoC / Cubit", "Clean Architecture", "Agora RTC & WebSockets"]
 }
 ```
 
 ### `projects.json`
 ```json
-[
-  {
-    "slug": "paypulse",
-    "title": "PayPulse",
-    "category": "Neobank & Crypto Mobile Wallet",
-    "summary": "Real-time crypto wallet with QRIS cross-border payments and biometric KYC.",
-    "problem": "Users needed a single app for fiat and crypto with compliant KYC and instant cross-border QR payments.",
-    "solution": "Built a Flutter/Kotlin app with WebSocket crypto feeds, QRIS gateway integration, and hardware-backed biometric KYC flows.",
-    "impact": null,
-    "bannerUrl": "/assets/images/projects/paypulse/banner.webp",
-    "screenshots": [
-      {
-        "image": "/assets/images/projects/paypulse/screen_home.webp",
-        "alt": "PayPulse home screen showing crypto portfolio balance and market overview",
-        "caption": "Portfolio Overview"
-      },
-      {
-        "image": "/assets/images/projects/paypulse/screen_wallet.webp",
-        "alt": "PayPulse wallet screen with QRIS payment QR code and transaction history",
-        "caption": "QRIS Wallet"
-      }
-    ],
-    "technologies": ["Flutter 3.x", "Kotlin", "WebSocket", "QRIS", "Biometrics", "Firebase"],
-    "metrics": [
-      { "label": "Real-time Feed Latency", "value": "< 50ms" },
-      { "label": "KYC Completion Rate", "value": "94%" }
-    ],
-    "accentColor": "#00F0FF",
-    "platform": ["Android", "iOS"],
-    "githubUrl": null,
-    "caseStudyUrl": null,
-    "featured": true
-  }
-]
+The canonical data lives in `composeApp/src/wasmJsMain/resources/assets/data/projects.json`.
+Real slugs: `dengerind`, `sai-coworking`, `iwwi-maintenance`, `perfect-assistant`.
+`bannerUrl` points at the first existing screenshot (`assets/projects/<slug>/screen-01.webp`); there are no `banner.webp` files.
+
+Excerpt (first project):
+```json
+{
+  "slug": "dengerind",
+  "title": "Dengerind",
+  "category": "Mental Health & Teleconsultation",
+  "bannerUrl": "assets/projects/dengerind/screen-01.webp",
+  "screenshots": [
+    {
+      "image": "assets/projects/dengerind/screen-01.webp",
+      "alt": "Dengerind home screen showing teleconsultation options, counseling topics, and counselor lists",
+      "caption": "Consultation Home"
+    }
+  ]
+}
 ```
 
 ### `experiences.json`
+See `composeApp/src/wasmJsMain/resources/assets/data/experiences.json` for the canonical entries (AXA Mandiri, PT Ragdalion Revolusi Industri).
+
+Excerpt:
 ```json
-[
-  {
-    "id": "technova",
-    "role": "Middle Mobile Developer",
-    "company": "TechNova Solutions",
-    "period": "2023 – Present",
-    "achievements": ["Flutter app 250k+ MAU", "CI/CD 4h → 18min"],
-    "current": true
-  }
-]
+{
+  "id": "axa-mandiri",
+  "role": "Senior Android Developer (Kotlin)",
+  "company": "AXA Mandiri",
+  "period": "Nov 2022 – Present",
+  "current": true,
+  "accentColor": "#00F0FF"
+}
 ```
 
 ---

@@ -305,7 +305,7 @@ val PortfolioTypography = Typography(
 | `MetricsSection` | `#metrics` | 4× AnimatedCounter in horizontal row |
 | `AboutSection` | `#about` | Narrative text, TechPill grid by category |
 | `ProjectsSection` | `#projects` | 2×2 GlowCard grid, ProjectModal on click |
-| `ServicesSection` | `#services` | 4 service GlowCards with icon |
+| `ServicesSection` | `#services` | 4 service GlowCards with tinted vector icons from `Res.drawable` |
 | `ExperienceSection` | `#experience` | Vertical timeline with milestone nodes |
 | `ContactSection` | `#contact` | Email/WhatsApp/Social links + back-to-top |
 

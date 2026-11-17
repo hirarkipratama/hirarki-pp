@@ -1,35 +1,24 @@
-This is a Kotlin Multiplatform project targeting Web.
+This is a Kotlin Multiplatform / Compose Multiplatform portfolio website targeting Kotlin/Wasm.
 
-* [/shared](./shared/src) is for code that will be shared across your Compose Multiplatform applications.
-  It contains several subfolders:
-  - [commonMain](./shared/src/commonMain/kotlin) is for code that’s common for all targets.
-  - Other folders are for Kotlin code that will be compiled for only the platform indicated in the folder name.
-    For example, if you want to use Apple’s CoreCrypto for the iOS part of your Kotlin app,
-    the [iosMain](./shared/src/iosMain/kotlin) folder would be the right place for such calls.
-    Similarly, if you want to edit the Desktop (JVM) specific part, the [jvmMain](./shared/src/jvmMain/kotlin)
-    folder is the appropriate location.
+The app lives in the single `:composeApp` module:
 
-### Running the apps
+- `composeApp/src/wasmJsMain/kotlin/` — UI, data models, and JSON data source
+- `composeApp/src/wasmJsMain/resources/assets/` — served content (`data/*.json`, `profile.webp`, `projects/<slug>/screen-XX.webp`, `cv/hirarki_cv.pdf`)
+- `composeApp/src/commonMain/composeResources/drawable/` — vector icon assets used through generated `Res` accessors
+- `composeApp/src/wasmJsMain/resources/favicon.svg` — browser favicon
 
-Use the run configurations provided by the run widget in your IDE's toolbar. You can also use these commands and options:
+The root `assets/` folder holds the original exported images; the served copies live under `composeApp/src/wasmJsMain/resources/assets/`.
 
-- Web app:
-  - Wasm target (faster, modern browsers): `./gradlew :webApp:wasmJsBrowserDevelopmentRun`
-  - JS target (slower, supports older browsers): `./gradlew :webApp:jsBrowserDevelopmentRun`
+### Running the app
 
-### Running tests
+```bash
+./gradlew :composeApp:wasmJsBrowserDevelopmentRun
+```
 
-Use the run button in your IDE's editor gutter, or run tests using Gradle tasks:
+### Building for production
 
-- Web tests:
-  - Wasm target: `./gradlew :shared:wasmJsTest`
-  - JS target: `./gradlew :shared:jsTest`
+```bash
+./gradlew :composeApp:wasmJsBrowserDistribution
+```
 
----
-
-Learn more about [Kotlin Multiplatform](https://www.jetbrains.com/help/kotlin-multiplatform-dev/get-started.html),
-[Compose Multiplatform](https://kotlinlang.org/compose-multiplatform/),
-[Kotlin/Wasm](https://kotl.in/wasm/)…
-
-We would appreciate your feedback on Compose/Web and Kotlin/Wasm in the public Slack channel [#compose-web](https://slack-chats.kotlinlang.org/c/compose-web).
-If you face any issues, please report them on [YouTrack](https://youtrack.jetbrains.com/newIssue?project=CMP).
+Output: `composeApp/build/dist/wasmJs/productionExecutable/`

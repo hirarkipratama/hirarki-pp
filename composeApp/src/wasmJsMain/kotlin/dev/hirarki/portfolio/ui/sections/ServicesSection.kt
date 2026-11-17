@@ -2,6 +2,7 @@ package dev.hirarki.portfolio.ui.sections
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsHoveredAsState
@@ -24,6 +25,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -34,6 +36,13 @@ import dev.hirarki.portfolio.ui.components.NeonButtonVariant
 import dev.hirarki.portfolio.ui.components.SectionHeader
 import dev.hirarki.portfolio.ui.theme.ObsidianColors
 import dev.hirarki.portfolio.ui.theme.PortfolioTypography
+import kmp_mobile_portofolio.composeapp.generated.resources.Res
+import kmp_mobile_portofolio.composeapp.generated.resources.ic_mobile
+import kmp_mobile_portofolio.composeapp.generated.resources.ic_rtc
+import kmp_mobile_portofolio.composeapp.generated.resources.ic_shield
+import kmp_mobile_portofolio.composeapp.generated.resources.ic_speed
+import org.jetbrains.compose.resources.DrawableResource
+import org.jetbrains.compose.resources.painterResource
 
 @Composable
 fun ServicesSection(
@@ -127,13 +136,12 @@ private fun ServiceCard(
         animationSpec = tween(150)
     )
 
-    // Icon key mapping: "cross-platform" → 📱, "native" → ⚡, "architecture" → 🏗, "ui-ux" → 🎨
-    val iconEmoji = when (service.iconKey.lowercase()) {
-        "cross-platform" -> "📱"
-        "native" -> "⚡"
-        "architecture" -> "🏗"
-        "ui-ux" -> "🎨"
-        else -> "🚀"
+    val serviceIcon: DrawableResource = when (service.iconKey.lowercase()) {
+        "mobile" -> Res.drawable.ic_mobile
+        "shield" -> Res.drawable.ic_shield
+        "rtc" -> Res.drawable.ic_rtc
+        "speed" -> Res.drawable.ic_speed
+        else -> Res.drawable.ic_speed
     }
 
     GlowCard(
@@ -156,9 +164,11 @@ private fun ServiceCard(
                     .background(ObsidianColors.ContainerMid),
                 contentAlignment = Alignment.Center
             ) {
-                Text(
-                    text = iconEmoji,
-                    fontSize = 22.sp
+                Image(
+                    painter = painterResource(serviceIcon),
+                    contentDescription = null,
+                    modifier = Modifier.size(26.dp),
+                    colorFilter = ColorFilter.tint(ObsidianColors.Primary)
                 )
             }
 

@@ -2,6 +2,7 @@ package dev.hirarki.portfolio.ui.sections
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -19,6 +20,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
@@ -31,6 +33,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.layout.ContentScale
@@ -53,7 +56,10 @@ import dev.hirarki.portfolio.ui.components.TechPill
 import dev.hirarki.portfolio.ui.components.parseHexColor
 import dev.hirarki.portfolio.ui.theme.ObsidianColors
 import dev.hirarki.portfolio.ui.theme.PortfolioTypography
+import kmp_mobile_portofolio.composeapp.generated.resources.Res
+import kmp_mobile_portofolio.composeapp.generated.resources.ic_arrow_forward
 import kotlinx.browser.window
+import org.jetbrains.compose.resources.painterResource
 
 @Composable
 fun ProjectsSection(
@@ -336,9 +342,17 @@ private fun FeaturedContentArea(
             modifier = Modifier.padding(top = 8.dp)
         ) {
             NeonButton(
-                text = "Explore Details →",
+                text = "Explore Details",
                 onClick = onProjectClick,
-                variant = NeonButtonVariant.PRIMARY
+                variant = NeonButtonVariant.PRIMARY,
+                icon = {
+                    Image(
+                        painter = painterResource(Res.drawable.ic_arrow_forward),
+                        contentDescription = null,
+                        modifier = Modifier.size(16.dp),
+                        colorFilter = ColorFilter.tint(Color.Black)
+                    )
+                }
             )
 
             if (project.githubUrl != null) {
@@ -527,13 +541,24 @@ private fun ProjectGridCard(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(
-                        text = "View Case Study →",
-                        style = PortfolioTypography.labelMedium.copy(
-                            color = accentColor,
-                            fontWeight = FontWeight.SemiBold
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
+                        Text(
+                            text = "View Case Study",
+                            style = PortfolioTypography.labelMedium.copy(
+                                color = accentColor,
+                                fontWeight = FontWeight.SemiBold
+                            )
                         )
-                    )
+                        Image(
+                            painter = painterResource(Res.drawable.ic_arrow_forward),
+                            contentDescription = null,
+                            modifier = Modifier.size(14.dp),
+                            colorFilter = ColorFilter.tint(accentColor)
+                        )
+                    }
 
                     if (project.githubUrl != null) {
                         Text(
