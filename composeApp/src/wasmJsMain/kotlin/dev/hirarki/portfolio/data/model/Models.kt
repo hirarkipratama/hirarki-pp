@@ -3,17 +3,28 @@ package dev.hirarki.portfolio.data.model
 import kotlinx.serialization.Serializable
 
 @Serializable
+data class MetricModel(
+    val label: String = "",
+    val value: Double = 0.0,
+    val suffix: String = ""
+)
+
+@Serializable
 data class ProfileModel(
     val name: String = "",
     val title: String = "",
     val tagline: String = "",
     val location: String = "",
     val email: String = "",
+    val whatsapp: String = "",
     val github: String = "",
     val linkedin: String = "",
+    val twitter: String = "",
     val cvUrl: String = "",
     val avatarUrl: String = "",
-    val metrics: List<MetricModel> = emptyList()
+    val heroSubheadline: String = "",
+    val metrics: List<MetricModel> = emptyList(),
+    val stackChips: List<String> = emptyList()
 )
 
 @Serializable
@@ -54,9 +65,12 @@ data class ExperienceModel(
     val id: String = "",
     val role: String = "",
     val company: String = "",
+    val companyType: String = "",
     val period: String = "",
+    val description: String = "",
     val achievements: List<String> = emptyList(),
-    val current: Boolean = false
+    val current: Boolean = false,
+    val accentColor: String = "#00F0FF"
 )
 
 @Serializable
@@ -64,19 +78,17 @@ data class ServiceModel(
     val id: String = "",
     val title: String = "",
     val description: String = "",
+    val features: List<String> = emptyList(),
     val iconKey: String = ""
 )
 
 @Serializable
-data class SkillModel(
+data class SkillCategoryModel(
     val name: String = "",
-    val category: String = "",
-    val proficiency: String = ""
+    val skills: List<String> = emptyList()
 )
 
 @Serializable
-data class MetricModel(
-    val label: String = "",
-    val value: Double = 0.0,
-    val suffix: String = ""
+data class SkillsModel(
+    val categories: List<SkillCategoryModel> = emptyList()
 )

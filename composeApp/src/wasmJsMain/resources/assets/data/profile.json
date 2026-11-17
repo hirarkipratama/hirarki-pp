@@ -1,0 +1,21 @@
+{
+  "name": "Hirarki Ardi Pratama",
+  "title": "Senior Mobile Developer (Flutter & Android)",
+  "tagline": "Engineering High-Performance, Resilient Cross-Platform Mobile Experiences",
+  "location": "Jakarta Selatan, Indonesia",
+  "email": "hirarki.pratama@gmail.com",
+  "whatsapp": "+62895800267596",
+  "github": "https://github.com/hirarki",
+  "linkedin": "https://linkedin.com/in/hirarki-pratama",
+  "twitter": "",
+  "cvUrl": "/assets/cv/hirarki_cv.pdf",
+  "avatarUrl": "assets/profile.webp",
+  "heroSubheadline": "Specialized in Flutter · Kotlin · BLoC/Cubit · Clean Architecture · Real-time RTC",
+  "metrics": [
+    { "label": "Years Experience", "value": 5.0, "suffix": "+" },
+    { "label": "Active Users Served", "value": 50.0, "suffix": "k+" },
+    { "label": "Crash-Free Sessions", "value": 99.8, "suffix": "%" },
+    { "label": "Code Reusability Boost", "value": 35.0, "suffix": "%" }
+  ],
+  "stackChips": ["Flutter & Dart", "Kotlin & Android", "BLoC / Cubit", "Clean Architecture", "Agora RTC & WebSockets"]
+}

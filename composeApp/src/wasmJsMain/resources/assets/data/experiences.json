@@ -1,0 +1,49 @@
+[
+  {
+    "id": "axa-mandiri",
+    "role": "Senior Mobile Developer (Flutter)",
+    "company": "AXA Mandiri",
+    "companyType": "Financial Services & Insurance",
+    "period": "Nov 2022 – Present",
+    "description": "Architected and maintained enterprise mobile applications handling daily financial transactions and policy lifecycle operations for 50,000+ policyholders and financial advisors.",
+    "achievements": [
+      "Applied Clean Architecture and modular state management (BLoC/GetX), increasing code reusability by 35% and accelerating release turnaround times",
+      "Implemented biometric authentication, dynamic token refresh, and certificate pinning for strict financial compliance",
+      "Optimized 30+ REST API endpoints and caching, cutting data consumption by 20% and improving screen load speeds by 40%",
+      "Integrated Crashlytics and performance monitoring, maintaining a 99.8% crash-free session rate across release cycles"
+    ],
+    "current": true,
+    "accentColor": "#00F0FF"
+  },
+  {
+    "id": "ragdalion",
+    "role": "Mobile Developer (Flutter & Cross-Platform)",
+    "company": "PT Ragdalion Revolusi Industri",
+    "companyType": "Software House & IoT Solutions",
+    "period": "Mar 2021 – Sep 2022",
+    "description": "Engineered and delivered robust mobile applications serving healthcare, co-working, and industrial automation clients from requirements to deployment.",
+    "achievements": [
+      "Built Dengerind mental health platform with Agora RTC for low-latency video consultations and real-time chat supporting thousands of concurrent users",
+      "Engineered SaicoWork coworking booking, QR check-in, and push notifications across 13 locations using Flutter, Firebase, and GetX",
+      "Developed OkeDok healthcare app with appointment booking and prescription tracking across diverse screen densities",
+      "Standardized API handling layers with Dio and interceptors with centralized error recovery and automated retry logic"
+    ],
+    "current": false,
+    "accentColor": "#FF007A"
+  },
+  {
+    "id": "maestro",
+    "role": "Mobile Developer",
+    "company": "PT Maestro Manajemen Nusantara",
+    "companyType": "Enterprise & Education Management",
+    "period": "Feb 2020 – Feb 2021",
+    "description": "Developed mobile and backend solutions streamlining enterprise attendance and school operations.",
+    "achievements": [
+      "Developed automated school attendance tracking application managing records for 1,000+ students and teachers",
+      "Built RESTful APIs using PHP/Lumen and optimized MySQL database queries for real-time mobile sync",
+      "Cut initial app launch latency by 25% through systematic debugging, unit testing, and memory leak resolution"
+    ],
+    "current": false,
+    "accentColor": "#00F0FF"
+  }
+]
