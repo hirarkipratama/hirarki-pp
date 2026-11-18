@@ -13,7 +13,7 @@ fun setupWebMetadata(profile: ProfileModel) {
     )
     setMetaTag("og:title", "${profile.name} · Mobile Developer Portfolio")
     setMetaTag("og:description", profile.tagline)
-    setMetaTag("og:image", absoluteAssetUrl(profile.avatarUrl))
+    setMetaTag("og:image", WebPaths.absoluteAssetUrl(profile.avatarUrl))
     setMetaTag("og:type", "website")
     setMetaTag("twitter:card", "summary_large_image")
     setMetaTag("twitter:creator", "@hirarki")
@@ -32,9 +32,4 @@ fun setMetaTag(name: String, content: String) {
         document.head?.appendChild(metaElement)
     }
     (meta as HTMLMetaElement).content = content
-}
-
-private fun absoluteAssetUrl(url: String): String {
-    if (url.startsWith("http://") || url.startsWith("https://")) return url
-    return "https://hirarki.dev/${url.removePrefix("/")}"
 }

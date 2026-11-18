@@ -18,6 +18,7 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.toComposeImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import dev.hirarki.portfolio.WebPaths
 import dev.hirarki.portfolio.ui.theme.ObsidianColors
 import dev.hirarki.portfolio.ui.theme.PortfolioTypography
 import kotlinx.browser.window
@@ -129,8 +130,7 @@ fun AsyncImage(
 }
 
 private suspend fun loadImageBitmap(url: String): ImageBitmap? = try {
-    val cleanUrl = if (url.startsWith("/")) url else "/$url"
-    val response = window.fetch(cleanUrl).await<Response>()
+    val response = window.fetch(WebPaths.asset(url)).await<Response>()
     if (!response.ok) {
         null
     } else {

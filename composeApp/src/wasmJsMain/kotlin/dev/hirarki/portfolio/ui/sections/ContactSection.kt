@@ -38,6 +38,7 @@ import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import dev.hirarki.portfolio.WebPaths
 import dev.hirarki.portfolio.data.model.ProfileModel
 import dev.hirarki.portfolio.ui.components.GlowCard
 import dev.hirarki.portfolio.ui.components.NeonButton
@@ -66,7 +67,7 @@ import org.w3c.dom.HTMLAnchorElement
 
 fun downloadCV(url: String) {
     val a = document.createElement("a") as HTMLAnchorElement
-    a.href = if (url.startsWith("/")) url else "/$url"
+    a.href = WebPaths.asset(url)
     a.download = "Hirarki_Wendri_CV.pdf"
     document.body?.appendChild(a)
     a.click()

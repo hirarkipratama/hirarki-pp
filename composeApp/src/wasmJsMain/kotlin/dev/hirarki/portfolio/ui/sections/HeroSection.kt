@@ -303,7 +303,7 @@ private fun HeroAvatar(
                 contentScale = ContentScale.Crop,
                 fallbackText = "HW",
                 priority = ImageLoadPriority.EAGER,
-                placeholderUrl = "/assets/profile-placeholder.webp"
+                placeholderUrl = "assets/profile-placeholder.webp"
             )
         }
     }

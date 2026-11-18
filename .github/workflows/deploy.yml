@@ -40,3 +40,5 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: composeApp/build/dist/wasmJs/productionExecutable
           publish_branch: gh-pages
+          keep_files: false
+          enable_jekyll: false

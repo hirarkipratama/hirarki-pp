@@ -69,6 +69,7 @@ tasks.named("wasmJsBrowserDistribution") {
         val jsFile = distDir.resolve("composeApp.js")
         val indexFile = distDir.resolve("index.html")
         distDir.resolve("composeApp.js.map").delete()
+        distDir.resolve("CNAME").delete()
         if (jsFile.exists() && indexFile.exists()) {
             val jsText = jsFile.readText()
             val wasmFileNames = Regex("""a\.p\+"([a-f0-9]+\.wasm)"""")
