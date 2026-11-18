@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://hirarki.dev/sitemap.xml
+Sitemap: https://hirarkipratama.github.io/hirarki-pp/sitemap.xml
