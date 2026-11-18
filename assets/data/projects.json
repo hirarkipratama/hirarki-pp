@@ -1,0 +1,213 @@
+[
+  {
+    "slug": "dengerind",
+    "title": "Dengerind",
+    "category": "Mental Health & Teleconsultation",
+    "summary": "24/7 mental health platform featuring real-time counseling chat, VoIP calls, and low-latency video conferencing.",
+    "problem": "Modern individuals face high barriers and scheduling friction when seeking immediate, private mental health support and professional psychological guidance.",
+    "solution": "Built an interactive cross-platform mobile application with Agora RTC for low-latency video consultations and VoIP calls, end-to-end encrypted chat, and appointment scheduling.",
+    "impact": "Supported thousands of concurrent user sessions with smooth multi-modal real-time teleconsultation.",
+    "bannerUrl": "assets/projects/dengerind/screen-01.webp",
+    "screenshots": [
+      {
+        "image": "assets/projects/dengerind/screen-01.webp",
+        "alt": "Dengerind home screen showing teleconsultation options, counseling topics, and counselor lists",
+        "caption": "Consultation Home"
+      },
+      {
+        "image": "assets/projects/dengerind/screen-02.webp",
+        "alt": "Dengerind appointment and counselor profile screen with real-time availability and booking",
+        "caption": "Counselor Profile & Booking"
+      },
+      {
+        "image": "assets/projects/dengerind/screen-03.webp",
+        "alt": "Dengerind real-time counseling chat session screen with interactive messaging",
+        "caption": "Counseling Session"
+      }
+    ],
+    "technologies": [
+      "Flutter",
+      "Dart",
+      "Agora RTC",
+      "Firebase",
+      "GetX"
+    ],
+    "metrics": [
+      {
+        "label": "Availability",
+        "value": "24/7"
+      },
+      {
+        "label": "Streaming",
+        "value": "Low-Latency RTC"
+      }
+    ],
+    "accentColor": "#00F0FF",
+    "platform": [
+      "Android",
+      "iOS"
+    ],
+    "githubUrl": null,
+    "caseStudyUrl": null,
+    "featured": true
+  },
+  {
+    "slug": "sai-coworking",
+    "title": "SaicoWork",
+    "category": "Smart Coworking & Office Management",
+    "summary": "Smart coworking and workspace booking application managing 13 branch locations with QR check-in and push alerts.",
+    "problem": "Freelancers, startups, and enterprise clients needed an efficient, unified way to discover facilities, reserve on-demand meeting rooms, and access workspaces across multi-city locations.",
+    "solution": "Engineered an enterprise coworking platform with on-demand room reservations, digital QR access control, automated member perk distribution, and OneSignal push notifications.",
+    "impact": "Seamlessly managed booking workflows and digital access control across 13 office locations.",
+    "bannerUrl": "assets/projects/sai-coworking/screen-01.webp",
+    "screenshots": [
+      {
+        "image": "assets/projects/sai-coworking/screen-01.webp",
+        "alt": "SaicoWork locations and available workspace overview screen",
+        "caption": "Workspace Explorer"
+      },
+      {
+        "image": "assets/projects/sai-coworking/screen-02.webp",
+        "alt": "SaicoWork meeting room details and on-demand reservation screen",
+        "caption": "Room Booking"
+      },
+      {
+        "image": "assets/projects/sai-coworking/screen-03.webp",
+        "alt": "SaicoWork user pass, active reservations, and QR access check-in screen",
+        "caption": "QR Pass & Perks"
+      }
+    ],
+    "technologies": [
+      "Flutter",
+      "Firebase",
+      "GetX",
+      "OneSignal"
+    ],
+    "metrics": [
+      {
+        "label": "Locations",
+        "value": "13 Cities"
+      },
+      {
+        "label": "Access",
+        "value": "QR Check-in"
+      }
+    ],
+    "accentColor": "#FF007A",
+    "platform": [
+      "Android",
+      "iOS"
+    ],
+    "githubUrl": null,
+    "caseStudyUrl": null,
+    "featured": true
+  },
+  {
+    "slug": "iwwi-maintenance",
+    "title": "IWWI Maintenance",
+    "category": "Industrial Facility & Machine Maintenance",
+    "summary": "Industrial maintenance management system featuring machine health monitoring, detailed equipment registry, and QR asset tracking.",
+    "problem": "Industrial facilities struggled with manual tracking of complex machinery specifications, maintenance schedules, and equipment downtime identification.",
+    "solution": "Developed an Android maintenance app with advanced equipment registration forms, real-time machine health monitoring dashboards, and instant QR code scanning for physical asset identification.",
+    "impact": "Streamlined maintenance operations, resource allocation, and equipment lifecycle tracking.",
+    "bannerUrl": "assets/projects/iwwi-maintenance/screen-01.webp",
+    "screenshots": [
+      {
+        "image": "assets/projects/iwwi-maintenance/screen-01.webp",
+        "alt": "IWWI machinery registration and specification details input screen",
+        "caption": "Equipment Registry"
+      },
+      {
+        "image": "assets/projects/iwwi-maintenance/screen-02.webp",
+        "alt": "IWWI real-time machine performance monitoring and telemetry status dashboard",
+        "caption": "Monitoring Dashboard"
+      },
+      {
+        "image": "assets/projects/iwwi-maintenance/screen-03.webp",
+        "alt": "IWWI rapid QR scanner interface for equipment lookup and maintenance logs",
+        "caption": "QR Code Scanning"
+      }
+    ],
+    "technologies": [
+      "Kotlin",
+      "Android SDK",
+      "Firebase",
+      "QR Code Scanning"
+    ],
+    "metrics": [
+      {
+        "label": "Identification",
+        "value": "Instant QR Scan"
+      },
+      {
+        "label": "Monitoring",
+        "value": "Real-time"
+      }
+    ],
+    "accentColor": "#00F0FF",
+    "platform": [
+      "Android"
+    ],
+    "githubUrl": null,
+    "caseStudyUrl": null,
+    "featured": true
+  },
+  {
+    "slug": "perfect-assistant",
+    "title": "Perfect Assistant",
+    "category": "Enterprise Task & Lifestyle Management",
+    "summary": "Personal & enterprise productivity assistant app streamlining schedules, smart task tracking, and priority workflows.",
+    "problem": "Professionals require an intuitive, low-latency mobile tool to organize daily complex tasks, personal routines, and priority-driven timelines.",
+    "solution": "Built a fluid, responsive mobile assistant delivering intuitive task management, calendar coordination, and real-time alerts.",
+    "impact": "Delivered smooth user experience with high responsiveness and automated reminders.",
+    "bannerUrl": "assets/projects/perfect-assistant/screen-01.webp",
+    "screenshots": [
+      {
+        "image": "assets/projects/perfect-assistant/screen-01.webp",
+        "alt": "Perfect Assistant daily agenda and task overview screen",
+        "caption": "Daily Dashboard"
+      },
+      {
+        "image": "assets/projects/perfect-assistant/screen-02.webp",
+        "alt": "Perfect Assistant task detail and schedule creation screen",
+        "caption": "Schedule Planning"
+      },
+      {
+        "image": "assets/projects/perfect-assistant/screen-03.webp",
+        "alt": "Perfect Assistant calendar integration and milestone tracking screen",
+        "caption": "Calendar & Milestones"
+      },
+      {
+        "image": "assets/projects/perfect-assistant/screen-04.webp",
+        "alt": "Perfect Assistant reminders, user settings, and productivity analytics screen",
+        "caption": "Analytics & Alerts"
+      }
+    ],
+    "technologies": [
+      "Kotlin",
+      "MVVM",
+      "Koin",
+      "Room Database",
+      "Coroutines",
+      "Flow",
+      "Jetpack Compose"
+    ],
+    "metrics": [
+      {
+        "label": "UI Performance",
+        "value": "60 FPS"
+      },
+      {
+        "label": "Task Sync",
+        "value": "Instant"
+      }
+    ],
+    "accentColor": "#FF007A",
+    "platform": [
+      "Android"
+    ],
+    "githubUrl": null,
+    "caseStudyUrl": null,
+    "featured": true
+  }
+]

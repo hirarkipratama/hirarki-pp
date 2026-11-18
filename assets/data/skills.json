@@ -1,0 +1,28 @@
+{
+  "categories": [
+    {
+      "name": "Languages & Core",
+      "skills": ["Dart", "Kotlin", "Java", "PHP", "SQL"]
+    },
+    {
+      "name": "Mobile Frameworks & SDKs",
+      "skills": ["Flutter SDK", "Android SDK", "Material Design", "Cupertino"]
+    },
+    {
+      "name": "State Management & Architecture",
+      "skills": ["BLoC / Cubit", "GetX", "Provider", "Clean Architecture", "MVVM", "Modular Architecture"]
+    },
+    {
+      "name": "APIs & Real-Time Services",
+      "skills": ["RESTful APIs (Dio)", "WebSocket", "Agora RTC (Video/Audio)", "Firebase (FCM, Crashlytics, Auth)", "OneSignal"]
+    },
+    {
+      "name": "Local Storage & Databases",
+      "skills": ["SQLite / SQFlite", "Hive", "Secure Storage", "SharedPreferences", "MySQL"]
+    },
+    {
+      "name": "Testing, Tooling & DevOps",
+      "skills": ["Unit Testing", "Widget Testing", "Flutter DevTools Profiling", "GitHub Actions", "Fastlane", "Google Play Console", "App Store Connect"]
+    }
+  ]
+}

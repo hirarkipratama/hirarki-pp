@@ -1,0 +1,46 @@
+[
+  {
+    "id": "cross-platform-dev",
+    "title": "Cross-Platform Mobile Engineering",
+    "description": "Production-ready Flutter & Android applications built with Clean Architecture, modular structure, and fluid 60fps animations.",
+    "features": [
+      "Flutter & Dart development for Android and iOS",
+      "Enterprise state management (BLoC, Cubit, GetX)",
+      "Adaptive UI for diverse screen densities & tablets"
+    ],
+    "iconKey": "mobile"
+  },
+  {
+    "id": "fintech-security",
+    "title": "FinTech Security & Hardening",
+    "description": "Enterprise-grade mobile security protocols compliant with financial regulations and secure transaction standards.",
+    "features": [
+      "Biometric authentication & secure hardware key storage",
+      "SSL/TLS Certificate Pinning & dynamic token rotation",
+      "Encrypted local storage & sensitive data masking"
+    ],
+    "iconKey": "shield"
+  },
+  {
+    "id": "realtime-rtc",
+    "title": "Real-time Teleconsultation & IoT",
+    "description": "Low-latency voice, video, and data streaming for telehealth, chat, and connected hardware platforms.",
+    "features": [
+      "Agora RTC audio/video conferencing & VoIP",
+      "WebSockets & real-time messaging protocols",
+      "QR code scanning & hardware peripheral integration"
+    ],
+    "iconKey": "rtc"
+  },
+  {
+    "id": "perf-optimization",
+    "title": "Performance Profiling & CI/CD",
+    "description": "Full-cycle app stabilization, memory leak debugging, automated testing, and automated store deployments.",
+    "features": [
+      "Flutter DevTools profiling (CPU, memory, frame rendering)",
+      "Automated unit, widget, and integration testing",
+      "CI/CD pipelines with GitHub Actions & Fastlane"
+    ],
+    "iconKey": "speed"
+  }
+]
