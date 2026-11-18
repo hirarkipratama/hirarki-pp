@@ -9,6 +9,7 @@ import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -29,13 +30,18 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInParent
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import dev.hirarki.portfolio.di.AppModule
 import dev.hirarki.portfolio.presentation.state.PortfolioUiState
@@ -58,13 +64,8 @@ import dev.hirarki.portfolio.ui.theme.PortfolioTheme
 import dev.hirarki.portfolio.ui.theme.PortfolioTypography
 import dev.hirarki.portfolio.ui.theme.reducedMotion
 import dev.hirarki.portfolio.ui.theme.rememberWindowDimensions
-
-private fun jsScrollToSection(sectionId: String, behavior: String): Unit =
-    js("document.getElementById(sectionId)?.scrollIntoView({ behavior: behavior, block: 'start' })")
-
-fun scrollToSection(sectionId: String, smooth: Boolean = true) {
-    jsScrollToSection(sectionId, if (smooth) "smooth" else "instant")
-}
+import kotlin.math.roundToInt
+import kotlinx.coroutines.launch
 
 private fun addJsKeydownListener(onEscape: () -> Unit): () -> Unit =
     js("""
@@ -95,6 +96,10 @@ fun App() {
     val selectedProject by viewModel.selectedProject.collectAsState()
     var isMobileMenuOpen by remember { mutableStateOf(false) }
     var projectCardFocusRequester by remember { mutableStateOf<FocusRequester?>(null) }
+    val scrollState = rememberScrollState()
+    val sectionOffsets = remember { mutableStateMapOf<String, Int>() }
+    val coroutineScope = rememberCoroutineScope()
+    val navBarHeightPx = with(LocalDensity.current) { 64.dp.toPx().roundToInt() }
 
     // Keyboard listener: Escape closes modal or mobile menu
     DisposableEffect(selectedProject, isMobileMenuOpen) {
@@ -117,6 +122,16 @@ fun App() {
 
     PortfolioTheme {
         val isReducedMotion = reducedMotion()
+        val scrollToSection: (String) -> Unit = { sectionId ->
+            val target = ((sectionOffsets[sectionId] ?: 0) - navBarHeightPx).coerceAtLeast(0)
+            coroutineScope.launch {
+                if (isReducedMotion) {
+                    scrollState.scrollTo(target)
+                } else {
+                    scrollState.animateScrollTo(target)
+                }
+            }
+        }
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -153,6 +168,9 @@ fun App() {
                 is PortfolioUiState.Success -> {
                     PortfolioPage(
                         uiState = state,
+                        scrollState = scrollState,
+                        sectionOffsets = sectionOffsets,
+                        onSectionPositioned = { id, y -> sectionOffsets[id] = y },
                         isMobileMenuOpen = isMobileMenuOpen,
                         onMenuToggle = { isMobileMenuOpen = it },
                         onProjectClick = { project, focusRequester ->
@@ -161,7 +179,7 @@ fun App() {
                         },
                         onNavClick = { sectionId ->
                             isMobileMenuOpen = false
-                            scrollToSection(sectionId, smooth = !isReducedMotion)
+                            scrollToSection(sectionId)
                         },
                         onDownloadCV = { downloadCV(state.profile.cvUrl) }
                     )
@@ -196,6 +214,9 @@ fun App() {
 @Composable
 fun PortfolioPage(
     uiState: PortfolioUiState.Success,
+    scrollState: ScrollState,
+    sectionOffsets: Map<String, Int>,
+    onSectionPositioned: (String, Int) -> Unit,
     isMobileMenuOpen: Boolean,
     onMenuToggle: (Boolean) -> Unit,
     onProjectClick: (dev.hirarki.portfolio.data.model.ProjectModel, FocusRequester) -> Unit,
@@ -206,23 +227,17 @@ fun PortfolioPage(
         setupWebMetadata(uiState.profile)
     }
 
-    val scrollState = rememberScrollState()
     val windowDimensions = rememberWindowDimensions()
     val isMobile = windowDimensions.isMobile
+    val navBarHeightPx = with(LocalDensity.current) { 64.dp.toPx().roundToInt() }
 
-    // Active section tracking based on scroll offset
-    // Approximate breakpoints for sections in scroll offset
     val activeSection by remember {
         derivedStateOf {
-            val scrollY = scrollState.value
-            when {
-                scrollY < 500 -> "hero"
-                scrollY < 1200 -> "about"
-                scrollY < 2400 -> "projects"
-                scrollY < 3400 -> "services"
-                scrollY < 4600 -> "experience"
-                else -> "contact"
-            }
+            val scrollY = scrollState.value + navBarHeightPx
+            sectionOffsets.entries
+                .filter { it.value <= scrollY }
+                .maxByOrNull { it.value }
+                ?.key ?: "hero"
         }
     }
 
@@ -246,40 +261,54 @@ fun PortfolioPage(
                 profile = uiState.profile,
                 onViewProjectsClick = { onNavClick("projects") },
                 onDownloadCVClick = onDownloadCV,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .onGloballyPositioned { onSectionPositioned("hero", it.positionInParent().y.roundToInt()) }
             )
 
             MetricsSection(
                 metrics = uiState.profile.metrics,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .onGloballyPositioned { onSectionPositioned("metrics", it.positionInParent().y.roundToInt()) }
             )
 
             AboutSection(
                 skills = uiState.skills,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .onGloballyPositioned { onSectionPositioned("about", it.positionInParent().y.roundToInt()) }
             )
 
             ProjectsSection(
                 projects = uiState.projects,
                 onProjectClick = onProjectClick,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .onGloballyPositioned { onSectionPositioned("projects", it.positionInParent().y.roundToInt()) }
             )
 
             ServicesSection(
                 services = uiState.services,
                 onContactClick = { onNavClick("contact") },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .onGloballyPositioned { onSectionPositioned("services", it.positionInParent().y.roundToInt()) }
             )
 
             ExperienceSection(
                 experiences = uiState.experiences,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .onGloballyPositioned { onSectionPositioned("experience", it.positionInParent().y.roundToInt()) }
             )
 
             ContactSection(
                 profile = uiState.profile,
                 onBackToTopClick = { onNavClick("hero") },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .onGloballyPositioned { onSectionPositioned("contact", it.positionInParent().y.roundToInt()) }
             )
         }
 

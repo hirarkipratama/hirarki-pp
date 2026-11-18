@@ -1,4 +1,5 @@
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
+import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -15,6 +16,15 @@ kotlin {
             commonWebpackConfig {
                 outputFileName = "composeApp.js"
                 sourceMaps = false
+                val moduleDir = outputPath?.parentFile?.parentFile?.parentFile?.parentFile
+                    ?: configDirectory?.parentFile
+                    ?: File(".")
+                val resourcesDir = File(moduleDir, "src/wasmJsMain/resources").absolutePath
+                devServer = KotlinWebpackConfig.DevServer(
+                    port = 8080,
+                    open = false,
+                    static = mutableListOf(resourcesDir)
+                )
             }
             webpackTask {
                 mainOutputFileName = "composeApp.js"
