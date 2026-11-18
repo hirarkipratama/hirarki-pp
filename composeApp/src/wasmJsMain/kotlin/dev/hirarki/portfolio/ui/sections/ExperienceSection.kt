@@ -1,6 +1,7 @@
 package dev.hirarki.portfolio.ui.sections
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
@@ -46,6 +47,7 @@ import dev.hirarki.portfolio.ui.components.parseHexColor
 import dev.hirarki.portfolio.ui.theme.JetBrainsMonoFamily
 import dev.hirarki.portfolio.ui.theme.ObsidianColors
 import dev.hirarki.portfolio.ui.theme.PortfolioTypography
+import dev.hirarki.portfolio.ui.theme.reducedMotion
 import kotlinx.coroutines.delay
 
 @Composable
@@ -100,11 +102,16 @@ private fun TimelineItem(
     val accentColor = parseHexColor(experience.accentColor)
     val isEven = index % 2 == 0
 
-    var visible by remember { mutableStateOf(false) }
+    val reducedMotion = reducedMotion()
+    var visible by remember { mutableStateOf(reducedMotion) }
 
-    LaunchedEffect(Unit) {
-        delay(index * 120L)
-        visible = true
+    LaunchedEffect(Unit, reducedMotion) {
+        if (reducedMotion) {
+            visible = true
+        } else {
+            delay(index * 120L)
+            visible = true
+        }
     }
 
     if (isDesktop) {
@@ -117,7 +124,11 @@ private fun TimelineItem(
                 // Card on left
                 AnimatedVisibility(
                     visible = visible,
-                    enter = fadeIn(tween(600)) + slideInHorizontally(tween(600)) { -it / 2 },
+                    enter = if (reducedMotion) {
+                        EnterTransition.None
+                    } else {
+                        fadeIn(tween(600)) + slideInHorizontally(tween(600)) { -it / 2 }
+                    },
                     modifier = Modifier.weight(1f)
                 ) {
                     ExperienceCard(experience = experience, accentColor = accentColor)
@@ -138,7 +149,11 @@ private fun TimelineItem(
                 )
                 AnimatedVisibility(
                     visible = visible,
-                    enter = fadeIn(tween(600)) + slideInHorizontally(tween(600)) { it / 2 },
+                    enter = if (reducedMotion) {
+                        EnterTransition.None
+                    } else {
+                        fadeIn(tween(600)) + slideInHorizontally(tween(600)) { it / 2 }
+                    },
                     modifier = Modifier.weight(1f)
                 ) {
                     ExperienceCard(experience = experience, accentColor = accentColor)
@@ -174,15 +189,19 @@ private fun TimelineNode(
     accentColor: Color,
     modifier: Modifier = Modifier
 ) {
-    val infiniteTransition = rememberInfiniteTransition()
-    val pulseScale by infiniteTransition.animateFloat(
-        initialValue = 1f,
-        targetValue = 1.8f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(1200),
-            repeatMode = RepeatMode.Reverse
-        )
-    )
+    val pulseScale = if (reducedMotion()) {
+        1f
+    } else {
+        val infiniteTransition = rememberInfiniteTransition()
+        infiniteTransition.animateFloat(
+            initialValue = 1f,
+            targetValue = 1.8f,
+            animationSpec = infiniteRepeatable(
+                animation = tween(1200),
+                repeatMode = RepeatMode.Reverse
+            )
+        ).value
+    }
 
     Column(
         modifier = modifier,
@@ -256,7 +275,7 @@ private fun ExperienceCard(
                         Text(
                             text = "CURRENT",
                             style = PortfolioTypography.labelSmall.copy(
-                                color = Color.White,
+                                color = ObsidianColors.OnSecondary,
                                 fontWeight = FontWeight.Bold
                             )
                         )

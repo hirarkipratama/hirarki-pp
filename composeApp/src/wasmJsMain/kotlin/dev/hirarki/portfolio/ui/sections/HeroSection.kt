@@ -24,7 +24,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -43,12 +42,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import dev.hirarki.portfolio.data.model.ProfileModel
 import dev.hirarki.portfolio.ui.components.AsyncImage
+import dev.hirarki.portfolio.ui.components.ImageLoadPriority
 import dev.hirarki.portfolio.ui.components.NeonButton
 import dev.hirarki.portfolio.ui.components.NeonButtonVariant
 import dev.hirarki.portfolio.ui.components.TechPill
 import dev.hirarki.portfolio.ui.components.TerminalText
 import dev.hirarki.portfolio.ui.theme.ObsidianColors
 import dev.hirarki.portfolio.ui.theme.PortfolioTypography
+import dev.hirarki.portfolio.ui.theme.reducedMotion
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -230,15 +231,19 @@ private fun HeroContentColumn(
 
 @Composable
 private fun ActiveStatusBadge(modifier: Modifier = Modifier) {
-    val infiniteTransition = rememberInfiniteTransition()
-    val pulseAlpha by infiniteTransition.animateFloat(
-        initialValue = 0.3f,
-        targetValue = 1f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(900),
-            repeatMode = RepeatMode.Reverse
-        )
-    )
+    val pulseAlpha = if (reducedMotion()) {
+        1f
+    } else {
+        val infiniteTransition = rememberInfiniteTransition()
+        infiniteTransition.animateFloat(
+            initialValue = 0.3f,
+            targetValue = 1f,
+            animationSpec = infiniteRepeatable(
+                animation = tween(900),
+                repeatMode = RepeatMode.Reverse
+            )
+        ).value
+    }
 
     Row(
         modifier = modifier
@@ -293,10 +298,12 @@ private fun HeroAvatar(
         ) {
             AsyncImage(
                 url = avatarUrl,
-                contentDescription = "Hirarki Wendri portrait",
+                contentDescription = "Profile photo of Hirarki Wendri",
                 modifier = Modifier.fillMaxWidth(),
                 contentScale = ContentScale.Crop,
-                fallbackText = "HW"
+                fallbackText = "HW",
+                priority = ImageLoadPriority.EAGER,
+                placeholderUrl = "/assets/profile-placeholder.webp"
             )
         }
     }

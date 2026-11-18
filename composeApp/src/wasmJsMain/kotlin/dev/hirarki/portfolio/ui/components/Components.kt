@@ -3,6 +3,7 @@ package dev.hirarki.portfolio.ui.components
 import androidx.compose.animation.core.EaseOutCubic
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.snap
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
@@ -36,6 +37,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.text.font.FontWeight
@@ -44,6 +50,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import dev.hirarki.portfolio.ui.theme.ObsidianColors
 import dev.hirarki.portfolio.ui.theme.PortfolioTypography
+import dev.hirarki.portfolio.ui.theme.accessibleFocusRing
+import dev.hirarki.portfolio.ui.theme.reducedMotion
 import kotlinx.coroutines.delay
 import kotlin.math.roundToInt
 
@@ -60,19 +68,23 @@ fun GlowCard(
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val isHovered by interactionSource.collectIsHoveredAsState()
+    val reducedMotion = reducedMotion()
 
-    // Enhanced hover animation for desktop
     val glowAlphaMultiplier by animateFloatAsState(
         targetValue = if (isHovered) 2.0f else 1.0f,
-        animationSpec = tween(durationMillis = 200)
+        animationSpec = if (reducedMotion) snap() else tween(durationMillis = 200)
     )
 
     val scale by animateFloatAsState(
-        targetValue = if (isHovered) 1.015f else 1.0f,
-        animationSpec = spring(
-            dampingRatio = Spring.DampingRatioMediumBouncy,
-            stiffness = Spring.StiffnessLow
-        )
+        targetValue = if (isHovered && !reducedMotion) 1.015f else 1.0f,
+        animationSpec = if (reducedMotion) {
+            snap()
+        } else {
+            spring(
+                dampingRatio = Spring.DampingRatioMediumBouncy,
+                stiffness = Spring.StiffnessLow
+            )
+        }
     )
 
     Surface(
@@ -124,17 +136,22 @@ fun NeonButton(
     val interactionSource = remember { MutableInteractionSource() }
     val isHovered by interactionSource.collectIsHoveredAsState()
     val isPressed by interactionSource.collectIsPressedAsState()
+    val reducedMotion = reducedMotion()
 
     val scale by animateFloatAsState(
         targetValue = when {
-            isPressed -> 0.96f
-            isHovered -> 1.03f
+            isPressed && !reducedMotion -> 0.96f
+            isHovered && !reducedMotion -> 1.03f
             else -> 1.0f
         },
-        animationSpec = spring(
-            dampingRatio = Spring.DampingRatioMediumBouncy,
-            stiffness = Spring.StiffnessMedium
-        )
+        animationSpec = if (reducedMotion) {
+            snap()
+        } else {
+            spring(
+                dampingRatio = Spring.DampingRatioMediumBouncy,
+                stiffness = Spring.StiffnessMedium
+            )
+        }
     )
 
     val shape = RoundedCornerShape(percent = 50)
@@ -161,8 +178,13 @@ fun NeonButton(
     Surface(
         onClick = onClick,
         modifier = modifier
+            .accessibleFocusRing(cornerRadius = 20.dp)
             .scale(scale)
-            .clip(shape),
+            .clip(shape)
+            .semantics(mergeDescendants = true) {
+                role = Role.Button
+                contentDescription = text
+            },
         shape = shape,
         color = bgColor,
         border = borderStroke,
@@ -232,7 +254,8 @@ fun SectionHeader(
         )
         Text(
             text = title,
-            style = PortfolioTypography.headlineLarge.copy(color = ObsidianColors.OnSurface)
+            style = PortfolioTypography.headlineLarge.copy(color = ObsidianColors.OnSurface),
+            modifier = Modifier.semantics(mergeDescendants = true) { heading() }
         )
         if (!subtitle.isNullOrBlank()) {
             Text(
@@ -255,28 +278,36 @@ fun AnimatedCounter(
     durationMs: Int = 2000
 ) {
     var started by remember { mutableStateOf(false) }
+    val reducedMotion = reducedMotion()
 
     LaunchedEffect(Unit) {
         started = true
     }
 
     val animatedValue by animateFloatAsState(
-        targetValue = if (started) targetValue.toFloat() else 0f,
-        animationSpec = tween(
-            durationMillis = durationMs,
-            easing = EaseOutCubic
-        )
+        targetValue = if (started || reducedMotion) targetValue.toFloat() else 0f,
+        animationSpec = if (reducedMotion) {
+            snap()
+        } else {
+            tween(
+                durationMillis = durationMs,
+                easing = EaseOutCubic
+            )
+        }
     )
 
+    val displayValue = if (reducedMotion) targetValue else animatedValue.toDouble()
     val formattedNumber = if (targetValue % 1.0 == 0.0) {
-        animatedValue.roundToInt().toString()
+        displayValue.roundToInt().toString()
     } else {
-        val rounded = (animatedValue * 10).roundToInt() / 10.0
+        val rounded = (displayValue * 10).roundToInt() / 10.0
         rounded.toString()
     }
 
     Column(
-        modifier = modifier,
+        modifier = modifier.semantics(mergeDescendants = true) {
+            contentDescription = "$formattedNumber$suffix $label"
+        },
         horizontalAlignment = Alignment.Start
     ) {
         Text(
@@ -305,44 +336,47 @@ fun TerminalText(
     var displayedChars by remember { mutableStateOf(0) }
     var isDeleting by remember { mutableStateOf(false) }
     var cursorVisible by remember { mutableStateOf(true) }
+    val reducedMotion = reducedMotion()
 
-    LaunchedEffect(texts) {
-        if (texts.isEmpty()) return@LaunchedEffect
-        while (true) {
-            val fullText = texts[currentTextIndex]
-            if (!isDeleting) {
-                if (displayedChars < fullText.length) {
-                    displayedChars++
-                    delay(typingSpeedMs.toLong())
+    if (!reducedMotion) {
+        LaunchedEffect(texts) {
+            if (texts.isEmpty()) return@LaunchedEffect
+            while (true) {
+                val fullText = texts[currentTextIndex]
+                if (!isDeleting) {
+                    if (displayedChars < fullText.length) {
+                        displayedChars++
+                        delay(typingSpeedMs.toLong())
+                    } else {
+                        delay(2000L)
+                        isDeleting = true
+                    }
                 } else {
-                    delay(2000L)
-                    isDeleting = true
+                    if (displayedChars > 0) {
+                        displayedChars--
+                        delay((typingSpeedMs / 2).toLong())
+                    } else {
+                        isDeleting = false
+                        currentTextIndex = (currentTextIndex + 1) % texts.size
+                        delay(400L)
+                    }
                 }
-            } else {
-                if (displayedChars > 0) {
-                    displayedChars--
-                    delay((typingSpeedMs / 2).toLong())
-                } else {
-                    isDeleting = false
-                    currentTextIndex = (currentTextIndex + 1) % texts.size
-                    delay(400L)
-                }
+            }
+        }
+
+        LaunchedEffect(Unit) {
+            while (true) {
+                cursorVisible = !cursorVisible
+                delay(cursorBlinkSpeedMs.toLong())
             }
         }
     }
 
-    LaunchedEffect(Unit) {
-        while (true) {
-            cursorVisible = !cursorVisible
-            delay(cursorBlinkSpeedMs.toLong())
-        }
-    }
-
     val currentText = texts.getOrNull(currentTextIndex) ?: ""
-    val visibleText = currentText.take(displayedChars)
+    val visibleText = if (reducedMotion) currentText else currentText.take(displayedChars)
 
     Text(
-        text = visibleText + if (cursorVisible) "█" else " ",
+        text = visibleText + if (reducedMotion || cursorVisible) "█" else " ",
         style = PortfolioTypography.labelLarge.copy(
             color = ObsidianColors.Primary,
             fontSize = 16.sp

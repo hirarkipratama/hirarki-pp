@@ -1,6 +1,8 @@
 package dev.hirarki.portfolio.ui.components
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
@@ -34,12 +36,21 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.isTraversalGroup
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.traversalIndex
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import dev.hirarki.portfolio.ui.theme.ObsidianColors
 import dev.hirarki.portfolio.ui.theme.PortfolioTypography
 import dev.hirarki.portfolio.ui.theme.SpaceGroteskFamily
+import dev.hirarki.portfolio.ui.theme.accessibleFocusRing
+import dev.hirarki.portfolio.ui.theme.activateOnEnterOrSpace
+import dev.hirarki.portfolio.ui.theme.reducedMotion
 
 @Composable
 fun NavBar(
@@ -53,19 +64,25 @@ fun NavBar(
     modifier: Modifier = Modifier
 ) {
     val navItems = listOf("About", "Projects", "Services", "Experience", "Contact")
+    val reducedMotion = reducedMotion()
 
     val navBgColor by animateColorAsState(
         targetValue = if (isScrolled) ObsidianColors.Surface.copy(alpha = 0.95f) else Color.Transparent,
-        animationSpec = tween(durationMillis = 300)
+        animationSpec = tween(durationMillis = if (reducedMotion) 0 else 300)
     )
 
     val navBorderColor by animateColorAsState(
         targetValue = if (isScrolled) ObsidianColors.Border else Color.Transparent,
-        animationSpec = tween(durationMillis = 300)
+        animationSpec = tween(durationMillis = if (reducedMotion) 0 else 300)
     )
 
     Surface(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier
+            .fillMaxWidth()
+            .semantics {
+                isTraversalGroup = true
+                traversalIndex = 0f
+            },
         color = navBgColor,
         border = BorderStroke(1.dp, navBorderColor)
     ) {
@@ -87,6 +104,12 @@ fun NavBar(
                 modifier = Modifier
                     .clip(RoundedCornerShape(4.dp))
                     .clickable { onNavClick("hero") }
+                    .activateOnEnterOrSpace { onNavClick("hero") }
+                    .accessibleFocusRing()
+                    .semantics(mergeDescendants = true) {
+                        role = Role.Button
+                        contentDescription = "Navigate to hero"
+                    }
                     .padding(4.dp)
             )
 
@@ -105,6 +128,12 @@ fun NavBar(
                             modifier = Modifier
                                 .clip(RoundedCornerShape(4.dp))
                                 .clickable { onNavClick(sectionId) }
+                                .activateOnEnterOrSpace { onNavClick(sectionId) }
+                                .accessibleFocusRing()
+                                .semantics(mergeDescendants = true) {
+                                    role = Role.Button
+                                    contentDescription = "Navigate to $sectionId"
+                                }
                                 .padding(vertical = 4.dp, horizontal = 4.dp)
                         ) {
                             Text(
@@ -136,7 +165,10 @@ fun NavBar(
                 )
             } else {
                 // Mobile Hamburger Toggle
-                IconButton(onClick = { onMenuToggle(!isMenuOpen) }) {
+                IconButton(
+                    onClick = { onMenuToggle(!isMenuOpen) },
+                    modifier = Modifier.accessibleFocusRing()
+                ) {
                     Icon(
                         imageVector = if (isMenuOpen) Icons.Default.Close else Icons.Default.Menu,
                         contentDescription = if (isMenuOpen) "Close navigation menu" else "Open navigation menu",
@@ -157,17 +189,30 @@ fun FullscreenMobileMenu(
     onClose: () -> Unit
 ) {
     val navItems = listOf("About", "Projects", "Services", "Experience", "Contact")
+    val reducedMotion = reducedMotion()
 
     AnimatedVisibility(
         visible = isOpen,
-        enter = fadeIn(tween(250)) + slideInVertically(tween(300)) { -it },
-        exit = fadeOut(tween(200)) + slideOutVertically(tween(250)) { -it }
+        enter = if (reducedMotion) {
+            EnterTransition.None
+        } else {
+            fadeIn(tween(250)) + slideInVertically(tween(300)) { -it }
+        },
+        exit = if (reducedMotion) {
+            ExitTransition.None
+        } else {
+            fadeOut(tween(200)) + slideOutVertically(tween(250)) { -it }
+        }
     ) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .background(ObsidianColors.Surface)
                 .padding(24.dp)
+                .semantics {
+                    isTraversalGroup = true
+                    traversalIndex = 0f
+                }
         ) {
             Column(
                 modifier = Modifier.fillMaxSize(),
@@ -186,12 +231,25 @@ fun FullscreenMobileMenu(
                             fontWeight = FontWeight.Bold,
                             color = ObsidianColors.Primary
                         ),
-                        modifier = Modifier.clickable {
-                            onClose()
-                            onNavClick("hero")
-                        }
+                        modifier = Modifier
+                            .clickable {
+                                onClose()
+                                onNavClick("hero")
+                            }
+                            .activateOnEnterOrSpace {
+                                onClose()
+                                onNavClick("hero")
+                            }
+                            .accessibleFocusRing()
+                            .semantics(mergeDescendants = true) {
+                                role = Role.Button
+                                contentDescription = "Navigate to hero"
+                            }
                     )
-                    IconButton(onClick = onClose) {
+                    IconButton(
+                        onClick = onClose,
+                        modifier = Modifier.accessibleFocusRing()
+                    ) {
                         Icon(
                             imageVector = Icons.Default.Close,
                             contentDescription = "Close menu",
@@ -217,6 +275,15 @@ fun FullscreenMobileMenu(
                                 .clickable {
                                     onClose()
                                     onNavClick(sectionId)
+                                }
+                                .activateOnEnterOrSpace {
+                                    onClose()
+                                    onNavClick(sectionId)
+                                }
+                                .accessibleFocusRing()
+                                .semantics(mergeDescendants = true) {
+                                    role = Role.Button
+                                    contentDescription = "Navigate to $sectionId"
                                 }
                                 .padding(vertical = 8.dp)
                         ) {

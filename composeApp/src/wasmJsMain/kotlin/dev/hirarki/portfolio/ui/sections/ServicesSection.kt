@@ -1,6 +1,7 @@
 package dev.hirarki.portfolio.ui.sections
 
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.snap
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -36,6 +37,7 @@ import dev.hirarki.portfolio.ui.components.NeonButtonVariant
 import dev.hirarki.portfolio.ui.components.SectionHeader
 import dev.hirarki.portfolio.ui.theme.ObsidianColors
 import dev.hirarki.portfolio.ui.theme.PortfolioTypography
+import dev.hirarki.portfolio.ui.theme.reducedMotion
 import kmp_mobile_portofolio.composeapp.generated.resources.Res
 import kmp_mobile_portofolio.composeapp.generated.resources.ic_mobile
 import kmp_mobile_portofolio.composeapp.generated.resources.ic_rtc
@@ -130,10 +132,11 @@ private fun ServiceCard(
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val isHovered by interactionSource.collectIsHoveredAsState()
+    val reducedMotion = reducedMotion()
 
     val scale by animateFloatAsState(
-        targetValue = if (isHovered) 1.02f else 1.0f,
-        animationSpec = tween(150)
+        targetValue = if (isHovered && !reducedMotion) 1.02f else 1.0f,
+        animationSpec = if (reducedMotion) snap() else tween(150)
     )
 
     val serviceIcon: DrawableResource = when (service.iconKey.lowercase()) {

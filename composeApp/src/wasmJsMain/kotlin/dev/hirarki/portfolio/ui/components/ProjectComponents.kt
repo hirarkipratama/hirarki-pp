@@ -7,9 +7,10 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusable
-import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.gestures.animateScrollBy
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -28,6 +29,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -38,18 +40,24 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusProperties
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.semantics.dialog
 import androidx.compose.ui.semantics.paneTitle
-import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -58,7 +66,10 @@ import dev.hirarki.portfolio.data.model.ProjectModel
 import dev.hirarki.portfolio.data.model.ScreenshotModel
 import dev.hirarki.portfolio.ui.theme.ObsidianColors
 import dev.hirarki.portfolio.ui.theme.PortfolioTypography
+import dev.hirarki.portfolio.ui.theme.accessibleFocusRing
+import dev.hirarki.portfolio.ui.theme.reducedMotion
 import kotlinx.browser.window
+import kotlinx.coroutines.launch
 
 // Helper to parse hex colors
 fun parseHexColor(hex: String, defaultColor: Color = ObsidianColors.Primary): Color {
@@ -107,9 +118,16 @@ fun ScreenshotGallery(
     screenshots: List<ScreenshotModel>,
     modifier: Modifier = Modifier,
     maxScreenshotsDesktop: Int = 3,
-    screenshotHeight: Int = 380
+    screenshotHeight: Int = 380,
+    focusRequester: FocusRequester? = null,
+    nextFocusRequester: FocusRequester? = null
 ) {
     if (screenshots.isEmpty()) return
+
+    val reducedMotion = reducedMotion()
+    val listState = rememberLazyListState()
+    val coroutineScope = rememberCoroutineScope()
+    val density = LocalDensity.current
 
     if (screenshots.size == 1) {
         Box(
@@ -132,7 +150,6 @@ fun ScreenshotGallery(
         val isMobile = maxWidth < 768.dp
 
         if (!isMobile) {
-            // Desktop: display up to maxScreenshotsDesktop side-by-side
             val displayList = screenshots.take(maxScreenshotsDesktop)
             Row(
                 modifier = Modifier
@@ -152,12 +169,41 @@ fun ScreenshotGallery(
                 }
             }
         } else {
-            // Mobile: horizontal scroll rail (LazyRow)
+            val requester = focusRequester
+            val galleryFocusModifier = if (requester != null) {
+                Modifier
+                    .focusRequester(requester)
+                    .focusProperties {
+                        next = nextFocusRequester ?: requester
+                    }
+            } else {
+                Modifier
+            }
+
             LazyRow(
+                state = listState,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(screenshotHeight.dp)
-                    .focusable(),
+                    .focusable()
+                    .then(galleryFocusModifier)
+                    .accessibleFocusRing()
+                    .onKeyEvent { event ->
+                        val direction = when (event.key) {
+                            Key.DirectionRight -> 1f
+                            Key.DirectionLeft -> -1f
+                            else -> return@onKeyEvent false
+                        }
+                        val amount = with(density) { 240.dp.toPx() * direction }
+                        coroutineScope.launch {
+                            if (reducedMotion) {
+                                listState.scrollBy(amount)
+                            } else {
+                                listState.animateScrollBy(amount)
+                            }
+                        }
+                        true
+                    },
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
                 contentPadding = PaddingValues(horizontal = 8.dp)
             ) {
@@ -183,27 +229,42 @@ fun ProjectModal(
     project: ProjectModel,
     onDismiss: () -> Unit
 ) {
-    val accentColor = parseHexColor(project.accentColor)
+    val closeFocusRequester = remember { FocusRequester() }
+    val galleryFocusRequester = remember { FocusRequester() }
+    val caseStudyFocusRequester = remember { FocusRequester() }
+    val githubFocusRequester = remember { FocusRequester() }
+    val hasGallery = project.screenshots.isNotEmpty()
+    val hasCaseStudy = project.caseStudyUrl != null
+    val hasGithub = project.githubUrl != null
+    val firstContentFocusRequester = when {
+        hasGallery -> galleryFocusRequester
+        hasCaseStudy -> caseStudyFocusRequester
+        hasGithub -> githubFocusRequester
+        else -> closeFocusRequester
+    }
+    val lastContentFocusRequester = when {
+        hasGithub -> githubFocusRequester
+        hasCaseStudy -> caseStudyFocusRequester
+        hasGallery -> galleryFocusRequester
+        else -> closeFocusRequester
+    }
 
-    // Full-screen backdrop
+    LaunchedEffect(project) {
+        closeFocusRequester.requestFocus()
+    }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(ObsidianColors.Background.copy(alpha = 0.92f))
-            .clickable(
-                interactionSource = remember { MutableInteractionSource() },
-                indication = null,
-                onClick = onDismiss
-            )
+            .pointerInput(onDismiss) {
+                detectTapGestures { onDismiss() }
+            }
             .onKeyEvent { keyEvent ->
                 if (keyEvent.key == Key.Escape) {
                     onDismiss()
                     true
                 } else false
-            }
-            .semantics {
-                role = Role.Button
-                paneTitle = "Project Details Modal"
             },
         contentAlignment = Alignment.Center
     ) {
@@ -219,11 +280,13 @@ fun ProjectModal(
                     .padding(20.dp)
                     .fillMaxWidth(0.92f)
                     .fillMaxHeight(0.90f)
-                    .clickable(
-                        interactionSource = remember { MutableInteractionSource() },
-                        indication = null,
-                        onClick = { /* prevent click-through */ }
-                    ),
+                    .pointerInput(Unit) {
+                        detectTapGestures { }
+                    }
+                    .semantics {
+                        dialog()
+                        paneTitle = "Project details for ${currentProject.title}"
+                    },
                 glowColor = currentAccentColor.copy(alpha = 0.25f),
                 borderColor = currentAccentColor.copy(alpha = 0.5f),
                 cornerRadius = 20.dp
@@ -264,6 +327,14 @@ fun ProjectModal(
                             onClick = onDismiss,
                             modifier = Modifier
                                 .size(44.dp)
+                                .focusRequester(closeFocusRequester)
+                                .focusProperties {
+                                    previous = lastContentFocusRequester
+                                    if (firstContentFocusRequester == closeFocusRequester) {
+                                        next = closeFocusRequester
+                                    }
+                                }
+                                .accessibleFocusRing(cornerRadius = 22.dp)
                                 .clip(CircleShape)
                                 .background(ObsidianColors.ContainerMid)
                         ) {
@@ -289,7 +360,13 @@ fun ProjectModal(
                         ScreenshotGallery(
                             screenshots = currentProject.screenshots,
                             screenshotHeight = 360,
-                            maxScreenshotsDesktop = 3
+                            maxScreenshotsDesktop = 3,
+                            focusRequester = galleryFocusRequester,
+                            nextFocusRequester = when {
+                                currentProject.caseStudyUrl != null -> caseStudyFocusRequester
+                                currentProject.githubUrl != null -> githubFocusRequester
+                                else -> closeFocusRequester
+                            }
                         )
                     }
 
@@ -348,7 +425,7 @@ fun ProjectModal(
                             Text(
                                 text = "IMPACT & RESULTS",
                                 style = PortfolioTypography.labelLarge.copy(
-                                    color = ObsidianColors.Secondary,
+                                    color = ObsidianColors.SecondaryText,
                                     fontWeight = FontWeight.Bold
                                 )
                             )
@@ -436,14 +513,26 @@ fun ProjectModal(
                                 NeonButton(
                                     text = "View Case Study",
                                     onClick = { window.open(currentProject.caseStudyUrl, "_blank") },
-                                    variant = NeonButtonVariant.PRIMARY
+                                    variant = NeonButtonVariant.PRIMARY,
+                                    modifier = Modifier
+                                        .focusRequester(caseStudyFocusRequester)
+                                        .focusProperties {
+                                            if (currentProject.githubUrl == null) {
+                                                next = closeFocusRequester
+                                            }
+                                        }
                                 )
                             }
                             if (currentProject.githubUrl != null) {
                                 NeonButton(
                                     text = "GitHub",
                                     onClick = { window.open(currentProject.githubUrl, "_blank") },
-                                    variant = NeonButtonVariant.SECONDARY
+                                    variant = NeonButtonVariant.SECONDARY,
+                                    modifier = Modifier
+                                        .focusRequester(githubFocusRequester)
+                                        .focusProperties {
+                                            next = closeFocusRequester
+                                        }
                                 )
                             }
                         }

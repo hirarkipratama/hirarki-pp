@@ -1,6 +1,8 @@
 package dev.hirarki.portfolio
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
@@ -16,9 +18,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -31,6 +34,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.unit.dp
 import dev.hirarki.portfolio.di.AppModule
 import dev.hirarki.portfolio.presentation.state.PortfolioUiState
@@ -51,16 +56,14 @@ import dev.hirarki.portfolio.ui.sections.downloadCV
 import dev.hirarki.portfolio.ui.theme.ObsidianColors
 import dev.hirarki.portfolio.ui.theme.PortfolioTheme
 import dev.hirarki.portfolio.ui.theme.PortfolioTypography
+import dev.hirarki.portfolio.ui.theme.reducedMotion
 import dev.hirarki.portfolio.ui.theme.rememberWindowDimensions
-import kotlinx.browser.document
-import kotlinx.browser.window
-import org.w3c.dom.HTMLMetaElement
 
-private fun jsScrollToSection(sectionId: String): Unit =
-    js("document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth', block: 'start' })")
+private fun jsScrollToSection(sectionId: String, behavior: String): Unit =
+    js("document.getElementById(sectionId)?.scrollIntoView({ behavior: behavior, block: 'start' })")
 
-fun scrollToSection(sectionId: String) {
-    jsScrollToSection(sectionId)
+fun scrollToSection(sectionId: String, smooth: Boolean = true) {
+    jsScrollToSection(sectionId, if (smooth) "smooth" else "instant")
 }
 
 private fun addJsKeydownListener(onEscape: () -> Unit): () -> Unit =
@@ -91,6 +94,7 @@ fun App() {
     val uiState by viewModel.uiState.collectAsState()
     val selectedProject by viewModel.selectedProject.collectAsState()
     var isMobileMenuOpen by remember { mutableStateOf(false) }
+    var projectCardFocusRequester by remember { mutableStateOf<FocusRequester?>(null) }
 
     // Keyboard listener: Escape closes modal or mobile menu
     DisposableEffect(selectedProject, isMobileMenuOpen) {
@@ -104,13 +108,15 @@ fun App() {
         onDispose { cleanup() }
     }
 
-    LaunchedEffect(Unit) {
-        document.title = "Hirarki Wendri · Mobile Developer Portfolio"
-        val metaDesc = document.querySelector("meta[name='description']") as? HTMLMetaElement
-        metaDesc?.content = "Hirarki Wendri — Senior Mobile Developer specializing in Flutter, Kotlin Multiplatform, and reactive native mobile architectures."
+    LaunchedEffect(selectedProject) {
+        if (selectedProject == null) {
+            projectCardFocusRequester?.requestFocus()
+            projectCardFocusRequester = null
+        }
     }
 
     PortfolioTheme {
+        val isReducedMotion = reducedMotion()
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -118,21 +124,7 @@ fun App() {
         ) {
             when (val state = uiState) {
                 is PortfolioUiState.Loading -> {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.spacedBy(16.dp)
-                        ) {
-                            CircularProgressIndicator(color = ObsidianColors.Primary)
-                            Text(
-                                text = "INITIALIZING ARCHITECTURE // LOADING DATA...",
-                                style = PortfolioTypography.labelMedium.copy(color = ObsidianColors.Primary)
-                            )
-                        }
-                    }
+                    LoadingSkeleton()
                 }
 
                 is PortfolioUiState.Error -> {
@@ -163,10 +155,13 @@ fun App() {
                         uiState = state,
                         isMobileMenuOpen = isMobileMenuOpen,
                         onMenuToggle = { isMobileMenuOpen = it },
-                        onProjectClick = { viewModel.selectProject(it) },
+                        onProjectClick = { project, focusRequester ->
+                            projectCardFocusRequester = focusRequester
+                            viewModel.selectProject(project)
+                        },
                         onNavClick = { sectionId ->
                             isMobileMenuOpen = false
-                            scrollToSection(sectionId)
+                            scrollToSection(sectionId, smooth = !isReducedMotion)
                         },
                         onDownloadCV = { downloadCV(state.profile.cvUrl) }
                     )
@@ -176,8 +171,16 @@ fun App() {
             // ProjectModal overlay with polished entry/exit animation
             AnimatedVisibility(
                 visible = selectedProject != null,
-                enter = fadeIn() + scaleIn(initialScale = 0.9f) + slideInVertically { it / 8 },
-                exit = fadeOut() + scaleOut(targetScale = 0.9f) + slideOutVertically { it / 8 }
+                enter = if (isReducedMotion) {
+                    EnterTransition.None
+                } else {
+                    fadeIn() + scaleIn(initialScale = 0.9f) + slideInVertically { it / 8 }
+                },
+                exit = if (isReducedMotion) {
+                    ExitTransition.None
+                } else {
+                    fadeOut() + scaleOut(targetScale = 0.9f) + slideOutVertically { it / 8 }
+                }
             ) {
                 selectedProject?.let { project ->
                     ProjectModal(
@@ -195,10 +198,14 @@ fun PortfolioPage(
     uiState: PortfolioUiState.Success,
     isMobileMenuOpen: Boolean,
     onMenuToggle: (Boolean) -> Unit,
-    onProjectClick: (dev.hirarki.portfolio.data.model.ProjectModel) -> Unit,
+    onProjectClick: (dev.hirarki.portfolio.data.model.ProjectModel, FocusRequester) -> Unit,
     onNavClick: (String) -> Unit,
     onDownloadCV: () -> Unit
 ) {
+    LaunchedEffect(uiState.profile) {
+        setupWebMetadata(uiState.profile)
+    }
+
     val scrollState = rememberScrollState()
     val windowDimensions = rememberWindowDimensions()
     val isMobile = windowDimensions.isMobile
@@ -300,5 +307,51 @@ fun PortfolioPage(
                 onClose = { onMenuToggle(false) }
             )
         }
+    }
+}
+
+@Composable
+private fun LoadingSkeleton() {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 20.dp, vertical = 88.dp),
+        verticalArrangement = Arrangement.spacedBy(20.dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(56.dp)
+                .clip(RoundedCornerShape(8.dp))
+                .background(ObsidianColors.Container)
+        )
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(320.dp)
+                .clip(RoundedCornerShape(16.dp))
+                .background(ObsidianColors.ContainerMid)
+        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            repeat(4) {
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(96.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(ObsidianColors.Container)
+                )
+            }
+        }
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(220.dp)
+                .clip(RoundedCornerShape(16.dp))
+                .background(ObsidianColors.Container)
+        )
     }
 }

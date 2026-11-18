@@ -11,6 +11,8 @@ object ObsidianColors {
     val Primary       = Color(0xFF00F0FF)   // Neon Cyan
     val PrimaryDim    = Color(0xFF00E5FF)
     val Secondary     = Color(0xFFFF007A)   // Cyber Magenta
+    val SecondaryText = Color(0xFFFF66AD)
+    val OnSecondary   = Color(0xFF000000)
     val OnSurface     = Color(0xFFE8EAED)
     val OnSurfaceDim  = Color(0xFF9AA0B2)
     val Border        = Color(0x14FFFFFF)   // rgba(255,255,255,0.08)

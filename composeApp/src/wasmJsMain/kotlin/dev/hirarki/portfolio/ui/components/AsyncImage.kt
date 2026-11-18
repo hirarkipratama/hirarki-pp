@@ -22,6 +22,7 @@ import dev.hirarki.portfolio.ui.theme.ObsidianColors
 import dev.hirarki.portfolio.ui.theme.PortfolioTypography
 import kotlinx.browser.window
 import kotlinx.coroutines.await
+import kotlinx.coroutines.delay
 import org.jetbrains.skia.Image as SkiaImage
 import org.khronos.webgl.ArrayBuffer
 import org.khronos.webgl.Int8Array
@@ -30,40 +31,45 @@ import org.w3c.fetch.Response
 
 private val imageCache = mutableMapOf<String, ImageBitmap>()
 
+enum class ImageLoadPriority { EAGER, LAZY }
+
 @Composable
 fun AsyncImage(
     url: String,
     contentDescription: String?,
     modifier: Modifier = Modifier,
     contentScale: ContentScale = ContentScale.Fit,
-    fallbackText: String? = null
+    fallbackText: String? = null,
+    priority: ImageLoadPriority = ImageLoadPriority.LAZY,
+    placeholderUrl: String? = null
 ) {
     var bitmap by remember(url) { mutableStateOf(imageCache[url]) }
+    var placeholderBitmap by remember(placeholderUrl) {
+        mutableStateOf(placeholderUrl?.let { imageCache[it] })
+    }
     var isLoading by remember(url) { mutableStateOf(bitmap == null) }
     var isError by remember(url) { mutableStateOf(false) }
 
-    LaunchedEffect(url) {
-        if (bitmap != null) return@LaunchedEffect
-        try {
-            isLoading = true
-            isError = false
-            val cleanUrl = if (url.startsWith("/")) url else "/$url"
-            val response = window.fetch(cleanUrl).await<Response>()
-            if (!response.ok) {
-                isError = true
-                isLoading = false
-                return@LaunchedEffect
+    LaunchedEffect(url, placeholderUrl, priority) {
+        if (placeholderUrl != null && placeholderBitmap == null) {
+            loadImageBitmap(placeholderUrl)?.let { loaded ->
+                imageCache[placeholderUrl] = loaded
+                placeholderBitmap = loaded
             }
-            val arrayBuffer = response.arrayBuffer().await<ArrayBuffer>()
-            val int8Array = Int8Array(arrayBuffer)
-            val byteArray = ByteArray(int8Array.length) { i -> int8Array[i] }
-            val skiaImage = SkiaImage.makeFromEncoded(byteArray)
-            val composeBitmap = skiaImage.toComposeImageBitmap()
-            imageCache[url] = composeBitmap
-            bitmap = composeBitmap
-            isLoading = false
-        } catch (e: Throwable) {
+        }
+
+        if (bitmap != null) return@LaunchedEffect
+        if (priority == ImageLoadPriority.LAZY) delay(100)
+
+        isLoading = true
+        isError = false
+        val loaded = loadImageBitmap(url)
+        if (loaded == null) {
             isError = true
+            isLoading = false
+        } else {
+            imageCache[url] = loaded
+            bitmap = loaded
             isLoading = false
         }
     }
@@ -73,6 +79,7 @@ fun AsyncImage(
         contentAlignment = Alignment.Center
     ) {
         val currentBitmap = bitmap
+        val currentPlaceholder = placeholderBitmap
         if (currentBitmap != null) {
             Image(
                 bitmap = currentBitmap,
@@ -80,7 +87,14 @@ fun AsyncImage(
                 modifier = Modifier.fillMaxSize(),
                 contentScale = contentScale
             )
-        } else if (isLoading) {
+        } else if (currentPlaceholder != null) {
+            Image(
+                bitmap = currentPlaceholder,
+                contentDescription = contentDescription,
+                modifier = Modifier.fillMaxSize(),
+                contentScale = contentScale
+            )
+        } else if (isLoading && priority == ImageLoadPriority.EAGER) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -92,8 +106,13 @@ fun AsyncImage(
                     strokeWidth = 2.dp
                 )
             }
+        } else if (isLoading) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(ObsidianColors.ContainerMid)
+            )
         } else {
-            // Error or fallback
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -107,4 +126,19 @@ fun AsyncImage(
             }
         }
     }
+}
+
+private suspend fun loadImageBitmap(url: String): ImageBitmap? = try {
+    val cleanUrl = if (url.startsWith("/")) url else "/$url"
+    val response = window.fetch(cleanUrl).await<Response>()
+    if (!response.ok) {
+        null
+    } else {
+        val arrayBuffer = response.arrayBuffer().await<ArrayBuffer>()
+        val int8Array = Int8Array(arrayBuffer)
+        val byteArray = ByteArray(int8Array.length) { index -> int8Array[index] }
+        SkiaImage.makeFromEncoded(byteArray).toComposeImageBitmap()
+    }
+} catch (e: Throwable) {
+    null
 }

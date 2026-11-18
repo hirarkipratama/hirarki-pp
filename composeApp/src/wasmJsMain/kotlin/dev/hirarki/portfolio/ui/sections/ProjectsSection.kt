@@ -1,6 +1,7 @@
 package dev.hirarki.portfolio.ui.sections
 
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.snap
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -32,6 +33,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.Paint
@@ -56,6 +59,9 @@ import dev.hirarki.portfolio.ui.components.TechPill
 import dev.hirarki.portfolio.ui.components.parseHexColor
 import dev.hirarki.portfolio.ui.theme.ObsidianColors
 import dev.hirarki.portfolio.ui.theme.PortfolioTypography
+import dev.hirarki.portfolio.ui.theme.accessibleFocusRing
+import dev.hirarki.portfolio.ui.theme.activateOnEnterOrSpace
+import dev.hirarki.portfolio.ui.theme.reducedMotion
 import kmp_mobile_portofolio.composeapp.generated.resources.Res
 import kmp_mobile_portofolio.composeapp.generated.resources.ic_arrow_forward
 import kotlinx.browser.window
@@ -64,13 +70,16 @@ import org.jetbrains.compose.resources.painterResource
 @Composable
 fun ProjectsSection(
     projects: List<ProjectModel>,
-    onProjectClick: (ProjectModel) -> Unit,
+    onProjectClick: (ProjectModel, FocusRequester) -> Unit,
     modifier: Modifier = Modifier
 ) {
     if (projects.isEmpty()) return
 
     val featuredProject = projects.firstOrNull { it.featured } ?: projects.first()
     val otherProjects = projects.filter { it.slug != featuredProject.slug }
+    val focusRequesters = remember(projects) {
+        projects.associate { project -> project.slug to FocusRequester() }
+    }
 
     BoxWithConstraints(
         modifier = modifier
@@ -96,8 +105,9 @@ fun ProjectsSection(
             // Step 3: Featured Project Card
             FeaturedProjectCard(
                 project = featuredProject,
-                onProjectClick = { onProjectClick(featuredProject) },
-                isDesktop = isDesktop
+                onProjectClick = { onProjectClick(featuredProject, focusRequesters.getValue(featuredProject.slug)) },
+                isDesktop = isDesktop,
+                focusRequester = focusRequesters.getValue(featuredProject.slug)
             )
 
             // Step 4: Remaining Project Cards Grid
@@ -105,6 +115,7 @@ fun ProjectsSection(
                 ProjectsGrid(
                     projects = otherProjects,
                     onProjectClick = onProjectClick,
+                    focusRequesters = focusRequesters,
                     isDesktop = isDesktop,
                     isTablet = containerWidth in 768.dp..1023.dp
                 )
@@ -122,6 +133,7 @@ private fun FeaturedProjectCard(
     project: ProjectModel,
     onProjectClick: () -> Unit,
     isDesktop: Boolean,
+    focusRequester: FocusRequester,
     modifier: Modifier = Modifier
 ) {
     val accentColor = parseHexColor(project.accentColor)
@@ -129,7 +141,10 @@ private fun FeaturedProjectCard(
     GlowCard(
         modifier = modifier
             .fillMaxWidth()
+            .focusRequester(focusRequester)
             .clickable(onClick = onProjectClick)
+            .activateOnEnterOrSpace(onProjectClick)
+            .accessibleFocusRing(20.dp)
             .semantics {
                 role = Role.Button
                 contentDescription = "${project.title} - ${project.category}"
@@ -372,7 +387,8 @@ private fun FeaturedContentArea(
 @Composable
 private fun ProjectsGrid(
     projects: List<ProjectModel>,
-    onProjectClick: (ProjectModel) -> Unit,
+    onProjectClick: (ProjectModel, FocusRequester) -> Unit,
+    focusRequesters: Map<String, FocusRequester>,
     isDesktop: Boolean,
     isTablet: Boolean,
     modifier: Modifier = Modifier
@@ -392,7 +408,8 @@ private fun ProjectsGrid(
                     rowProjects.forEach { project ->
                         ProjectGridCard(
                             project = project,
-                            onProjectClick = { onProjectClick(project) },
+                            onProjectClick = { onProjectClick(project, focusRequesters.getValue(project.slug)) },
+                            focusRequester = focusRequesters.getValue(project.slug),
                             modifier = Modifier.weight(1f)
                         )
                     }
@@ -411,7 +428,8 @@ private fun ProjectsGrid(
             projects.forEach { project ->
                 ProjectGridCard(
                     project = project,
-                    onProjectClick = { onProjectClick(project) },
+                    onProjectClick = { onProjectClick(project, focusRequesters.getValue(project.slug)) },
+                    focusRequester = focusRequesters.getValue(project.slug),
                     modifier = Modifier.fillMaxWidth()
                 )
             }
@@ -424,25 +442,30 @@ private fun ProjectsGrid(
 private fun ProjectGridCard(
     project: ProjectModel,
     onProjectClick: () -> Unit,
+    focusRequester: FocusRequester,
     modifier: Modifier = Modifier
 ) {
     val accentColor = parseHexColor(project.accentColor)
     val interactionSource = remember { MutableInteractionSource() }
     val isHovered by interactionSource.collectIsHoveredAsState()
+    val reducedMotion = reducedMotion()
 
     val scale by animateFloatAsState(
-        targetValue = if (isHovered) 1.02f else 1.0f,
-        animationSpec = tween(150)
+        targetValue = if (isHovered && !reducedMotion) 1.02f else 1.0f,
+        animationSpec = if (reducedMotion) snap() else tween(150)
     )
 
     GlowCard(
         modifier = modifier
             .scale(scale)
+            .focusRequester(focusRequester)
             .clickable(
                 interactionSource = interactionSource,
                 indication = null,
                 onClick = onProjectClick
             )
+            .activateOnEnterOrSpace(onProjectClick)
+            .accessibleFocusRing(16.dp)
             .semantics {
                 role = Role.Button
                 contentDescription = "${project.title} - ${project.category}"

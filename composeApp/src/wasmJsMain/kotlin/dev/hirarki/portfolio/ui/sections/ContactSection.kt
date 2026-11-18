@@ -1,6 +1,7 @@
 package dev.hirarki.portfolio.ui.sections
 
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.snap
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -31,6 +32,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import dev.hirarki.portfolio.data.model.ProfileModel
@@ -41,6 +46,9 @@ import dev.hirarki.portfolio.ui.components.SectionHeader
 import dev.hirarki.portfolio.ui.theme.JetBrainsMonoFamily
 import dev.hirarki.portfolio.ui.theme.ObsidianColors
 import dev.hirarki.portfolio.ui.theme.PortfolioTypography
+import dev.hirarki.portfolio.ui.theme.accessibleFocusRing
+import dev.hirarki.portfolio.ui.theme.activateOnEnterOrSpace
+import dev.hirarki.portfolio.ui.theme.reducedMotion
 import kmp_mobile_portofolio.composeapp.generated.resources.Res
 import kmp_mobile_portofolio.composeapp.generated.resources.ic_arrow_up
 import kmp_mobile_portofolio.composeapp.generated.resources.ic_chat
@@ -242,7 +250,14 @@ fun ContactSection(
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(6.dp),
-                        modifier = Modifier.clickable(onClick = onBackToTopClick)
+                        modifier = Modifier
+                            .clickable(onClick = onBackToTopClick)
+                            .activateOnEnterOrSpace(onBackToTopClick)
+                            .accessibleFocusRing()
+                            .semantics(mergeDescendants = true) {
+                                role = Role.Button
+                                contentDescription = "Back to top of the page"
+                            }
                     ) {
                         Text(
                             text = "Back to Top",
@@ -272,7 +287,14 @@ private fun ContactRow(
     onClick: (() -> Unit)?
 ) {
     val clickableModifier = if (onClick != null) {
-        Modifier.clickable(onClick = onClick)
+        Modifier
+            .clickable(onClick = onClick)
+            .activateOnEnterOrSpace(onClick)
+            .accessibleFocusRing()
+            .semantics(mergeDescendants = true) {
+                role = Role.Button
+                contentDescription = "$title: $value"
+            }
     } else Modifier
 
     Row(
@@ -312,10 +334,11 @@ private fun SocialButton(
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val isHovered by interactionSource.collectIsHoveredAsState()
+    val reducedMotion = reducedMotion()
 
     val scale by animateFloatAsState(
-        targetValue = if (isHovered) 1.08f else 1.0f,
-        animationSpec = tween(150)
+        targetValue = if (isHovered && !reducedMotion) 1.08f else 1.0f,
+        animationSpec = if (reducedMotion) snap() else tween(150)
     )
 
     Box(
@@ -333,7 +356,13 @@ private fun SocialButton(
                 interactionSource = interactionSource,
                 indication = null,
                 onClick = onClick
-            ),
+            )
+            .activateOnEnterOrSpace(onClick)
+            .accessibleFocusRing(cornerRadius = 22.dp)
+            .semantics(mergeDescendants = true) {
+                role = Role.Button
+                contentDescription = "Open $label profile"
+            },
         contentAlignment = Alignment.Center
     ) {
         Image(

@@ -1,6 +1,7 @@
 package dev.hirarki.portfolio.ui.sections
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.background
@@ -37,6 +38,7 @@ import dev.hirarki.portfolio.ui.components.SectionHeader
 import dev.hirarki.portfolio.ui.components.TechPill
 import dev.hirarki.portfolio.ui.theme.ObsidianColors
 import dev.hirarki.portfolio.ui.theme.PortfolioTypography
+import dev.hirarki.portfolio.ui.theme.reducedMotion
 import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -184,17 +186,26 @@ private fun AboutSkillsStack(
                 )
             )
 
+            val reducedMotion = reducedMotion()
             skills.categories.forEachIndexed { index, category ->
-                var isVisible by remember { mutableStateOf(false) }
+                var isVisible by remember { mutableStateOf(reducedMotion) }
 
-                LaunchedEffect(Unit) {
-                    delay(index * 100L)
-                    isVisible = true
+                LaunchedEffect(Unit, reducedMotion) {
+                    if (reducedMotion) {
+                        isVisible = true
+                    } else {
+                        delay(index * 100L)
+                        isVisible = true
+                    }
                 }
 
                 AnimatedVisibility(
                     visible = isVisible,
-                    enter = fadeIn() + slideInVertically { it / 2 }
+                    enter = if (reducedMotion) {
+                        EnterTransition.None
+                    } else {
+                        fadeIn() + slideInVertically { it / 2 }
+                    }
                 ) {
                     Column(
                         modifier = Modifier.fillMaxWidth(),
@@ -203,7 +214,7 @@ private fun AboutSkillsStack(
                         Text(
                             text = category.name,
                             style = PortfolioTypography.labelMedium.copy(
-                                color = ObsidianColors.Secondary,
+                                color = ObsidianColors.SecondaryText,
                                 fontWeight = FontWeight.SemiBold
                             )
                         )

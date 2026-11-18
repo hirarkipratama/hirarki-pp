@@ -3,6 +3,7 @@ package dev.hirarki.portfolio.ui.theme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 
 private val DarkColorScheme = darkColorScheme(
     background = ObsidianColors.Background,
@@ -24,7 +25,11 @@ fun PortfolioTheme(
     MaterialTheme(
         colorScheme = DarkColorScheme,
         typography = PortfolioTypography,
-        shapes = PortfolioShapes,
-        content = content
-    )
+        shapes = PortfolioShapes
+    ) {
+        CompositionLocalProvider(
+            LocalReducedMotion provides rememberPrefersReducedMotion(),
+            content = content
+        )
+    }
 }

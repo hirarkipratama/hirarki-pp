@@ -1,0 +1,24 @@
+{
+  "name": "Hirarki Ardi Pratama · Mobile Developer Portfolio",
+  "short_name": "Hirarki Wendri",
+  "description": "Senior Mobile Developer specializing in Flutter, Kotlin, and high-performance cross-platform mobile experiences.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0C0E14",
+  "theme_color": "#0C0E14",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
