@@ -24,6 +24,10 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -34,14 +38,18 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import dev.hirarki.portfolio.data.model.ProfileModel
 import dev.hirarki.portfolio.ui.components.AsyncImage
+import dev.hirarki.portfolio.ui.components.BackgroundCanvas
 import dev.hirarki.portfolio.ui.components.ImageLoadPriority
 import dev.hirarki.portfolio.ui.components.NeonButton
 import dev.hirarki.portfolio.ui.components.NeonButtonVariant
@@ -57,11 +65,15 @@ fun HeroSection(
     profile: ProfileModel,
     onViewProjectsClick: () -> Unit,
     onDownloadCVClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    showParticles: Boolean = true
 ) {
-    BoxWithConstraints(
+    var heroSize by remember { mutableStateOf(IntSize.Zero) }
+
+    Box(
         modifier = modifier
             .fillMaxWidth()
+            .onGloballyPositioned { heroSize = it.size }
             .drawBehind {
                 // Subtle radial gradient glow in top-right: Primary at 5% alpha
                 drawCircle(
@@ -76,58 +88,69 @@ fun HeroSection(
                 )
             }
     ) {
-        val containerWidth = maxWidth
-        val isDesktop = containerWidth >= 1024.dp
-        val horizontalPadding = if (containerWidth > 1200.dp) 120.dp else if (containerWidth > 600.dp) 48.dp else 20.dp
-        val verticalPadding = if (isDesktop) 120.dp else 60.dp
+        if (heroSize.height > 0) {
+            BackgroundCanvas(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(with(LocalDensity.current) { heroSize.height.toDp() }),
+                showParticles = showParticles
+            )
+        }
 
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = horizontalPadding, vertical = verticalPadding)
-        ) {
-            if (isDesktop) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    // Left Column (Content)
-                    HeroContentColumn(
-                        profile = profile,
-                        onViewProjectsClick = onViewProjectsClick,
-                        onDownloadCVClick = onDownloadCVClick,
-                        modifier = Modifier.weight(1.1f)
-                    )
+        BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+            val containerWidth = maxWidth
+            val isDesktop = containerWidth >= 1024.dp
+            val horizontalPadding = if (containerWidth > 1200.dp) 120.dp else if (containerWidth > 600.dp) 48.dp else 20.dp
+            val verticalPadding = if (isDesktop) 120.dp else 60.dp
 
-                    Spacer(modifier = Modifier.width(60.dp))
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = horizontalPadding, vertical = verticalPadding)
+            ) {
+                if (isDesktop) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        // Left Column (Content)
+                        HeroContentColumn(
+                            profile = profile,
+                            onViewProjectsClick = onViewProjectsClick,
+                            onDownloadCVClick = onDownloadCVClick,
+                            modifier = Modifier.weight(1.1f)
+                        )
 
-                    // Right Column (Portrait)
-                    HeroAvatar(
-                        avatarUrl = profile.avatarUrl,
-                        sizeDp = 380,
-                        modifier = Modifier.weight(0.9f)
-                    )
-                }
-            } else {
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(40.dp)
-                ) {
-                    // Avatar on top on mobile/tablet
-                    HeroAvatar(
-                        avatarUrl = profile.avatarUrl,
-                        sizeDp = if (containerWidth > 600.dp) 280 else 220
-                    )
+                        Spacer(modifier = Modifier.width(60.dp))
 
-                    // Content below
-                    HeroContentColumn(
-                        profile = profile,
-                        onViewProjectsClick = onViewProjectsClick,
-                        onDownloadCVClick = onDownloadCVClick,
-                        modifier = Modifier.fillMaxWidth()
-                    )
+                        // Right Column (Portrait)
+                        HeroAvatar(
+                            avatarUrl = profile.avatarUrl,
+                            sizeDp = 380,
+                            modifier = Modifier.weight(0.9f)
+                        )
+                    }
+                } else {
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(40.dp)
+                    ) {
+                        // Avatar on top on mobile/tablet
+                        HeroAvatar(
+                            avatarUrl = profile.avatarUrl,
+                            sizeDp = if (containerWidth > 600.dp) 280 else 220
+                        )
+
+                        // Content below
+                        HeroContentColumn(
+                            profile = profile,
+                            onViewProjectsClick = onViewProjectsClick,
+                            onDownloadCVClick = onDownloadCVClick,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
                 }
             }
         }
