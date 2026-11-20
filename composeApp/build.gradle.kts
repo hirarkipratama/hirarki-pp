@@ -20,11 +20,11 @@ kotlin {
                     ?: configDirectory?.parentFile
                     ?: File(".")
                 val resourcesDir = File(moduleDir, "src/wasmJsMain/resources").absolutePath
-                devServer = KotlinWebpackConfig.DevServer(
-                    port = 8080,
-                    open = false,
-                    static = mutableListOf(resourcesDir)
-                )
+                devServer = (devServer ?: KotlinWebpackConfig.DevServer()).apply {
+                    port = 8080
+                    open = false
+                    static = (static ?: mutableListOf()).apply { add(resourcesDir) }
+                }
             }
             webpackTask {
                 mainOutputFileName = "composeApp.js"
